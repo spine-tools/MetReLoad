@@ -13,7 +13,7 @@ from .merra2 import get_merra2_data
 
 @click.group(invoke_without_command=True)
 @click.option('--version', is_flag=True, default=False, help="Show version and exit")
-@click.option('--debug/--no-debug', default=False)
+@click.option('--debug', is_flag=True, default=False)
 def cli(version, debug):
     """Console script for metreload."""
     if version:
@@ -25,6 +25,7 @@ def cli(version, debug):
         logzero.loglevel(logging.DEBUG)
 
     return 0
+
 
 @cli.command()
 @click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)")
