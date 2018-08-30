@@ -3,7 +3,14 @@ Python application for downloading meteorological reanalysis data
 
 ## Installation
 
+Install requirered packages with
+
+    pip install -r requirements.txt
+   
+Install MetReLoad with
+
     pip install [-e] .
+
 
 ## Usage
 
