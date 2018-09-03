@@ -41,7 +41,7 @@ setup(
     description="Python application for downloading meteorological reanalysis data",
     entry_points={
         'console_scripts': [
-            'metreload=metreload.cli:cli',
+            'metreload=metreload.cli:main',
         ],
     },
     install_requires=requirements,

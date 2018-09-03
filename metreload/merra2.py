@@ -2,54 +2,54 @@
 
 import os.path
 from logzero import logger
+from webob.exc import HTTPError
 
-import pandas as pd
 import xarray as xa
 from pydap.cas.urs import setup_session
 
 
 BASE_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
-def get_merra2_data(collection, user, password, out_dir):
+#TODO: Make these command line options
+LAT, LON = (47.302765165, 7.100761435)
+START_TIME = '1980-01-01'
+END_TIME = '1980-01-02'
+VARIABLES = ['tlml', 'ulml', 'vlml']
+
+def get_merra2_data(collection, username, password, 
+                    out_dir,
+                    lat=LAT, lon=LON, 
+                    start_time=START_TIME, end_time=END_TIME,
+                    variables=VARIABLES):
 
     # Construct the URL
     url = '/'.join((BASE_URL, collection))
 
-    LOCATIONS = {'loc1': (47.302765165, 7.100761435),
-    #             'loc2': (65.25628568,	17.28856116),
-    #             'loc3': (60.34302959130653, 13.948979161811456),
-    #             'loc4':  (63.09723221389482, 17.151276444868675)
-                }
+    logger.debug("Setting up session to %s as %s", url, username)
+    with setup_session(username=username, password=password,
+                       check_url=url) as session:
+        logger.debug("Opening Pydap data store")
+        try:
+            store = xa.backends.PydapDataStore.open(url, session=session)
+        except Exception:
+            raise RuntimeError("Invalid collection name")
 
-    START_TIME = '1980-01-01'
-    END_TIME = '1980-01-02'
+        logger.debug("Opening dataset")
+        try:
+            src_ds = xa.open_dataset(store, chunks={'time': 24})
+        except HTTPError:
+            raise RuntimeError("Authentication failed!")
 
-    VARIABLES = ['tlml', 'ulml', 'vlml']
+        subset_ds = (src_ds[variables].sel(time=slice(start_time, end_time))
+                                    .sel(lat=lat, lon=lon, method='nearest',
+                                        drop=True))
+        # Add dates
+        subset_ds['date'] = subset_ds.time.to_pandas().dt.strftime('%Y%m%d')
 
-    logger.debug("Setting up session to %s", url)
-    session = setup_session(username=user, password=password,
-                            check_url=url)
-    store = xa.backends.PydapDataStore.open(url, session=session)
-
-    logger.debug("Opening dataset")
-    src = xa.open_dataset(store, chunks={'time': 24})
-
-    data = src[VARIABLES].sel(time=slice(START_TIME, END_TIME))
-
-    out = xa.Dataset(coords={'time': data['time'],
-                            'location': list(LOCATIONS.keys())})
-
-    datasets = list()
-    for loc, (x, y) in LOCATIONS.items():
-        datasets.append(data.sel(lat=y, lon=x, method='nearest', drop=True))
-    out = xa.concat(datasets, dim=pd.Index(LOCATIONS.keys(), name='location'))
-    out['date'] = out.time.to_pandas().dt.strftime('%Y%m%d')
-
-    dates, datasets = zip(*out.groupby('date'))
-
-    basename = out.attrs['title'].split(':')[0].replace(' ', '.')
-    filepaths = [os.path.join(out_dir, 
-                            '{}.{}.SUB.nc4'.format(basename, date)) 
-                for date in dates]
-
-    xa.save_mfdataset(datasets, filepaths)
+        # Write as multi-file dataset
+        dates, datasets = zip(*subset_ds.groupby('date'))
+        basename = src_ds.attrs['title'].split(':')[0].replace(' ', '.')
+        filepaths = [os.path.join(out_dir, 
+                                '{}.{}.SUB.nc4'.format(basename, date))
+                    for date in dates]
+        xa.save_mfdataset(datasets, filepaths)

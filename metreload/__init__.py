@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Top-level package for ReLoad."""
+"""Top-level package for MetReLoad."""
 
 __author__ = """Erkka Rinne"""
 __email__ = 'erkka.rinne@vtt.fi'

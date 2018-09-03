@@ -3,40 +3,53 @@
 """Console script for reload."""
 import sys
 import logging
+from getpass import getuser
 
 import logzero
+from logzero import logger
 import click
 
-from . import __version__
-from .merra2 import get_merra2_data
+from metreload.merra2 import get_merra2_data
+
+
+def print_help(ctx):
+    click.echo(ctx.get_help())
 
 
 @click.group(invoke_without_command=True)
-@click.option('--version', is_flag=True, default=False, help="Show version and exit")
+@click.version_option()
 @click.option('--debug', is_flag=True, default=False)
-def cli(version, debug):
-    """Console script for metreload."""
-    if version:
-        click.echo("Version {}".format(__version__))
-        return 0
-    
+@click.pass_context
+def cli(ctx, debug):
+    """MetReLoad: an application for downloading meteorological reanalysis data"""
     if debug:
-        click.echo("Debug mode ON", color='red')
+        click.echo("Debug mode ON")
         logzero.loglevel(logging.DEBUG)
 
-    return 0
+    if ctx.invoked_subcommand is None:
+        print_help(ctx)
 
 
 @cli.command()
-@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)")
-@click.option('-U', '--user', help="Username")
-@click.option('--password', prompt=True, hide_input=True)
-@click.option('-o', '--output-dir', help="Output directory")              
-def merra2(collection, user, password, output_dir):
+@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)", 
+              required=True)
+@click.option('-U', '--username', default=getuser)
+@click.option('--password', default=' ')
+@click.option('-o', '--output-dir', help="Output directory", default='.') 
+def merra2(collection, username, password, output_dir):
     click.echo("Downloading MERRA-2 data. . .")
-    get_merra2_data(collection, user, password, output_dir)
-    click.echo("Done!")
+    try:
+        get_merra2_data(collection, username, password, output_dir)
+    except RuntimeError as err:
+        logger.error(str(err))
+        raise click.ClickException(err)
+    else:
+        click.echo("Done!")
+
+
+def main():
+    cli(obj={})
 
 
 if __name__ == "__main__":
-    sys.exit(cli())  # pragma: no cover
+    main()
