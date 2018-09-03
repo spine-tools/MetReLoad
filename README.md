@@ -29,13 +29,13 @@ Use the `-e` switch if you want an editable copy (for development).
 ### Commands  
 #### `merra2`  
 
-Download MERRA-2 data
+Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see instructions [here](https://disc.gsfc.nasa.gov/data-access).
 
 ##### Options
 ```
-  -c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code)
-  -U, --user TEXT        Username
-  --password TEXT
+  -c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code) [required]
+  -U, --user TEXT        Username (defaults to current user)
+  --password TEXT        Password 
   -o, --output-dir TEXT  Output directory
   --help                 Show this message and exit.
 ```
