@@ -46,7 +46,7 @@ setup(
     },
     install_requires=requirements,
     license="LGPLv3 License",
-    long_description=readme #+ '\n\n' + history,
+    long_description=readme, #+ '\n\n' + history,
     include_package_data=True,
     keywords=['reanalysis', 'data', 'meteorology'],
     name='MetReLoad',
