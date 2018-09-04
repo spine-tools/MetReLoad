@@ -42,6 +42,8 @@ Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see 
 --help                 Show this message and exit.
 ```
 
+Refer to [MERRA-2 file specification](https://gmao.gsfc.nasa.gov/pubs/docs/Bosilovich785.pdf) for the names of data collections.
+
 
 ## Contributing
 
