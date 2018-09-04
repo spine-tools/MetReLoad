@@ -33,11 +33,11 @@ Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see 
 
 ##### Options
 ```
-  -c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code) [required]
-  -U, --user TEXT        Username (defaults to current user)
-  --password TEXT        Password 
-  -o, --output-dir TEXT  Output directory
-  --help                 Show this message and exit.
+-c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code) [required]
+-U, --user TEXT        Username (defaults to current user)
+--password TEXT        Password 
+-o, --output-dir TEXT  Output directory
+--help                 Show this message and exit.
 ```
 
 
