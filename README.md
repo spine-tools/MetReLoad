@@ -3,7 +3,9 @@ Python application for downloading meteorological reanalysis data
 
 ## Installation
 
-A [conda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html)  or a [virtual environment](https://docs.python.org/3/library/venv.html) is recommended. Install required packages with
+Python 3 is required. A [conda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html)  or a [virtual environment](https://docs.python.org/3/library/venv.html) is recommended. 
+
+Install required packages with
 
     pip install -r requirements.txt
 
