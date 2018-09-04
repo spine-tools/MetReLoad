@@ -2,6 +2,7 @@
 
 """Console script for reload."""
 import sys
+import os.path
 import logging
 from getpass import getuser
 
@@ -31,13 +32,13 @@ def cli(ctx, debug):
 
 
 @cli.command()
-@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)", 
+@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)",
               required=True)
 @click.option('-U', '--username', default=getuser)
 @click.option('--password', default=' ')
-@click.option('-o', '--output-dir', help="Output directory", default='.') 
+@click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir)
 def merra2(collection, username, password, output_dir):
-    click.echo("Downloading MERRA-2 data. . .")
+    click.echo("Downloading MERRA-2 data . . .")
     try:
         get_merra2_data(collection, username, password, output_dir)
     except RuntimeError as err:
