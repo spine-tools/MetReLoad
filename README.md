@@ -41,6 +41,21 @@ Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see 
 ```
 
 
+## Contributing
+
+Install development requirements with
+
+    pip install -r requirements.txt -r requirements_dev.txt
+
+Install the package in editable mode with
+
+    pip install -e .
+
+Before committing, run tests with
+
+    python setup.py test
+
+
 &nbsp;
 <hr>
 <center>
