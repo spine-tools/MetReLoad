@@ -4,6 +4,7 @@ import os.path
 from logzero import logger
 from webob.exc import HTTPError
 
+import requests
 import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
@@ -49,6 +50,12 @@ class MERRA2Dataset(object):
         base_url : str, optional
             Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
         """
+
+        # Initialize with empty data
+        self._ds = xa.Dataset()
+        self._subset_ds = self._ds
+        self._session = requests.Session()
+        self._store = PydapDataStore(xa.Dataset())
 
         # Initialize session and open dataset
         url = '/'.join((base_url, collection))
