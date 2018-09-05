@@ -14,7 +14,7 @@ with open('README.md') as readme_file:
 #    history = history_file.read()
 
 requirements = ['Click >=6.0', 
-                'pandas >=0.23.4',
+                #'pandas >=0.23.4',
                 'xarray >=0.10.0',
                 'Click >=6.0',
                 'lxml >=4.1.1',

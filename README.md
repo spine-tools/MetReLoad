@@ -47,9 +47,13 @@ Refer to [MERRA-2 file specification](https://gmao.gsfc.nasa.gov/pubs/docs/Bosil
 
 ## Contributing
 
-Install development requirements with
+Install development requirements into your current Python environment with
 
     pip install -r requirements.txt -r requirements_dev.txt
+
+Alternatively, if you are using `conda` you can also create a new development environment with
+
+   conda env create --file conda/develop.yml --name <NAME>
 
 Install the package in editable mode with
 
