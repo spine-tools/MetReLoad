@@ -63,6 +63,13 @@ Before committing, run tests with
 
     python setup.py test
 
+### Building with PyInstaller
+
+PyInstaller version 3.4 is required. Excute 
+
+    pyinstaller metreload.spec
+
+to build an executable distribution into `dist/metreload`.
 
 &nbsp;
 <hr>
