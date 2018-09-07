@@ -86,6 +86,11 @@ class MERRA2Dataset(object):
         # Initially subset equals the whole data
         self._subset_ds = self._ds
 
+        # Get coordinates and variables for this collection
+        self._coords = [coord for coord in self._ds.coords
+                        if len(self._ds.coords[coord]) > 1]
+        self._variables = list(self._ds.data_vars)
+
     def __del__(self):
         self._subset_ds = None
         self._ds = None
@@ -153,34 +158,49 @@ class MERRA2Dataset(object):
         variables : list
             List of variables to include, or '*' to include all
         """
+        subset_ds = self._subset_ds
+
         logger.debug("Subsetting dataset")
         if variables is not None:
             if variables == '*':
-                variables = list(self._ds.data_vars.keys())
-            subset_ds = self._ds[variables]        
+                variables = self._variables
+            else:
+                variables = [var for var in variables if var in self._variables]
+                #TODO: inform about incorrect variables
+            if len(variables) > 1:
+                subset_ds = self._ds[variables]
+            else:
+                raise RuntimeError("No variables selected")
 
         # Subset time
         if not (start_time is None and end_time is None):
-            subset_ds = subset_ds.sel(time=slice(start_time, end_time))
+            if 'time' in self._coords:
+                subset_ds = subset_ds.sel(time=slice(start_time, end_time))
+            else:
+                logger.warn("Trying to time subset a time-invariant collection, ignoring")
 
         # Subset location
         if location is not None:
-            if len(location) == 2:  # TODO: List of points?
-                lat, lon = location
-                assert lat > -90 and lat < 90  # TODO: Better error messages
-                assert lon > -180 and lon < 180
-            elif len(location) == 4:
-                west, east, south, north = location
-                assert (west < east and south < north)  # TODO: better error messages
-                assert all(lon > -180 and lon < 180 for lon in (west, east))
-                assert all(lat > -90 and lat < 90 for lat in (south, north))
-                lat = slice(south, north)
-                lon = slice(west, east)
+            if set(('lat', 'lon')).issubset(self._coords):
+                if len(location) == 2:  # TODO: List of points?
+                    lat, lon = location
+                    assert lat > -90 and lat < 90  # TODO: Better error messages
+                    assert lon > -180 and lon < 180
+                    kwargs = dict(method='nearest')
+                elif len(location) == 4:
+                    west, east, south, north = location
+                    assert (west < east and south < north)  # TODO: better error messages
+                    assert all(lon > -180 and lon < 180 for lon in (west, east))
+                    assert all(lat > -90 and lat < 90 for lat in (south, north))
+                    lat = slice(south, north)
+                    lon = slice(west, east)
+                    kwargs = dict()
+                else:
+                    raise RuntimeError("Wrong number of location arguments.")
             else:
-                raise RuntimeError("Wrong number of location arguments.")
+                logger.warn("Trying to location subset a location-invariant collection, ignoring")
 
-            subset_ds = subset_ds.sel(lat=lat, lon=lon, 
-                                      method='nearest', drop=True)
+            subset_ds = subset_ds.sel(lat=lat, lon=lon, **kwargs)
 
         self._subset_ds = subset_ds
 
