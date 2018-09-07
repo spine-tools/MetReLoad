@@ -127,7 +127,7 @@ class MERRA2Dataset(object):
         logger.debug("Writing to %s", os.path.abspath(savedir))
         xa.save_mfdataset(datasets, filepaths)
 
-    def to_xarray(self, squeeze=True):
+    def to_xarray(self):
         """Convert to xarray Dataset
 
         Parameters
@@ -135,11 +135,8 @@ class MERRA2Dataset(object):
         squeeze : bool, optional
             If ``True``, drops dimesions with length 1
         """
-
-        if squeeze:
-            return self._subset_ds.squeeze(drop=True)
-        else:
-            return self._subset_ds
+        logger.debug("Loading dask array to memory")
+        return self._subset_ds.squeeze().load()
 
     def subset(self, location=None, 
                start_time=None, end_time=None,
