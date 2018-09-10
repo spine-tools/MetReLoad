@@ -58,7 +58,7 @@ class MERRA2Dataset(object):
         self._store = PydapDataStore(xa.Dataset())
 
         # Initialize session and open dataset
-        url = '/'.join((base_url, collection))
+        url = '/'.join((base_url, collection.upper()))
         logger.debug("Setting up session to %s as %s", url, username)
         try:
             self._session = setup_session(username, password, check_url=url)
@@ -160,12 +160,17 @@ class MERRA2Dataset(object):
         logger.debug("Subsetting dataset")
         if variables is not None:
             if variables == '*':
-                variables = self._variables
+                variables_to_get = self._variables
             else:
-                variables = [var for var in variables if var in self._variables]
-                #TODO: inform about incorrect variables
-            if len(variables) > 1:
-                subset_ds = self._ds[variables]
+                variables_to_get = list()
+                for var in variables:
+                    varname = var.lower()
+                    if varname in self._variables:
+                        variables_to_get.append(varname)
+                    else:
+                        logger.warning("Unknown variable '%s'", var)
+            if len(variables_to_get) > 0:
+                subset_ds = self._ds[variables_to_get]
             else:
                 raise RuntimeError("No variables selected")
 
