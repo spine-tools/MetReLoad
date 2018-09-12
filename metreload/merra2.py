@@ -83,6 +83,13 @@ class MERRA2Dataset(object):
             self._session.close()
             raise RuntimeError("Authentication failed!")
 
+        # Fix for mysterious `area` variable error
+        if collection.upper() == 'M2C0NXASM':
+            try:
+                self._ds = self._ds.drop('area')
+            except KeyError:
+                pass
+
         # Initially subset equals the whole data
         logger.debug("Making a subset copy")
         self._subset_ds = self._ds.copy()
