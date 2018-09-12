@@ -159,12 +159,12 @@ class MERRA2Dataset(object):
             lat, lon = location 
         elif len(location)==4:
             north, west, south, east = location
-            lat = slice(south, north)
-            lon = slice(west, east)
+            lat = [south, north]
+            lon = [west, east]            
         else:
             raise RuntimeError("Wrong number of location arguments.")
         
-        # print("lat",lat,"\nlon",lon)
+        print("lat",lat,"\nlon",lon)
         subset_ds = subset_ds.sel(lat=lat, lon=lon, 
                                       method='nearest', drop=True)
         self._subset_ds = subset_ds

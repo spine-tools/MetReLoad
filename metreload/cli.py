@@ -94,8 +94,6 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
         assert (west < east and south < north)  # TODO: better error messages
         assert all(lon > -180 and lon < 180 for lon in (west, east))
         assert all(lat > -90 and lat < 90 for lat in (south, north))
-        lat = slice(south, north)
-        lon = slice(west, east)
     else:
         print ("ERROR: Option location contains an invalid number of arguments ", location)
         print_usage()
