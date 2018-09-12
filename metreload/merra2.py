@@ -164,7 +164,6 @@ class MERRA2Dataset(object):
         else:
             raise RuntimeError("Wrong number of location arguments.")
         
-        print("lat",lat,"\nlon",lon)
         subset_ds = subset_ds.sel(lat=lat, lon=lon, 
                                       method='nearest', drop=True)
         self._subset_ds = subset_ds

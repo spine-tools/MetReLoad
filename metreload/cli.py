@@ -15,11 +15,11 @@ from metreload.merra2 import get_merra2_data
 
 
 def print_usage():
-    click.echo("\nExample usage:\n merra2 --collection=M2T1NXFLX --username=<to_be_defined> --password=<to_be_defined>")
-    click.echo("\nFurthermore: latitude(lat), longitude(lon)\n location=[<lat-north>,<lon-west>] or \n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] ")
-    
-    
-
+    click.echo("\nExample usage:\n merra2 --collection=M2T1NXFLX --username=<to_be_defined> --password=<to_be_defined> --start_time=\"1980-01-01\"" \
+    "\n        --end_time=\"1980-01-02\" --variables=\"['tlml', 'ulml', 'vlml']\" --location=\"[60.2, 24.5,60.1, 24.7]\"")
+    click.echo("Note that latitude(lat), longitude(lon) is specified as follows:\n location=[<lat-north>,<lon-west>] or" \
+               "\n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] ")
+       
 def print_help(ctx):    
     click.echo(ctx.get_help())
     print_usage()
@@ -46,9 +46,7 @@ def cli(ctx, debug):
 @click.option('--start_time', default='1980-01-01')
 @click.option('--end_time', default='1980-01-02')
 @click.option('--variables', default= "['tlml', 'ulml', 'vlml']")
-#@click.option('--location', default= "[60.2, 24.5]")
 @click.option('--location', default= "[60.2, 24.5,60.1, 24.7]")
-
 
 def merra2(collection, username, password, output_dir, start_time, end_time, variables,location):
     click.echo("Download MERRA-2 data")
