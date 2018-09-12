@@ -9,13 +9,20 @@ from getpass import getuser
 import logzero
 from logzero import logger
 import click
+import ast
 
 from metreload.merra2 import get_merra2_data
 
 
-def print_help(ctx):
-    click.echo(ctx.get_help())
+def print_usage():
+    click.echo("\nExample usage:\n merra2 --collection=M2T1NXFLX --username=<to_be_defined> --password=<to_be_defined>")
+    click.echo("\nFurthermore: latitude(lat), longitude(lon)\n location=[<lat-north>,<lon-west>] or \n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] ")
+    
+    
 
+def print_help(ctx):    
+    click.echo(ctx.get_help())
+    print_usage()
 
 @click.group(invoke_without_command=True)
 @click.version_option()
@@ -32,15 +39,70 @@ def cli(ctx, debug):
 
 
 @cli.command()
-@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)",
-              required=True)
+@click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)")
 @click.option('-U', '--username', default=getuser)
-@click.option('--password', default=' ')
+@click.option('--password', default='')
 @click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir)
-def merra2(collection, username, password, output_dir):
-    click.echo("Downloading MERRA-2 data . . .")
+@click.option('--start_time', default='1980-01-01')
+@click.option('--end_time', default='1980-01-02')
+@click.option('--variables', default= "['tlml', 'ulml', 'vlml']")
+#@click.option('--location', default= "[60.2, 24.5]")
+@click.option('--location', default= "[60.2, 24.5,60.1, 24.7]")
+
+
+def merra2(collection, username, password, output_dir, start_time, end_time, variables,location):
+    click.echo("Download MERRA-2 data")
+   
+    #click.echo("with options")
+    #used_options=str(locals())
+    #click.echo(used_options)
+    #click.echo("\n")
+    
+    #Check input arguments
+    for (key,value) in locals().items():
+        if value is (None or ""):
+            print ("ERROR: Option \"",key,"\" holds an invalid value \"", value ,"\"")
+            keylist = []
+            keylist.extend(iter(locals().keys()))
+            keylist = keylist[:-1]              
+            print ("Option list: ", keylist)
+            print_usage()
+            break
+            exit() 
+    #Parse variables
     try:
-        get_merra2_data(collection, username, password, output_dir)
+        variables= ast.literal_eval(variables)
+    except SyntaxError:
+        print ("ERROR: Option variables is invalid ", variables)
+        print_usage()
+        exit()
+    #Parse location    
+    try:
+        location= ast.literal_eval(location)
+    except SyntaxError:
+        print ("ERROR: Option location is invalid ", location)
+        print_usage()
+        exit()  
+    if len(location)==2:
+        lat=location[0]
+        lon=location[1]
+        assert lat > -90 and lat < 90  # TODO: Better error messages
+        assert lon > -180 and lon < 180        
+    elif len(location)==4:
+        #west, east, south, north = location
+        north, west, south, east = location
+        assert (west < east and south < north)  # TODO: better error messages
+        assert all(lon > -180 and lon < 180 for lon in (west, east))
+        assert all(lat > -90 and lat < 90 for lat in (south, north))
+        lat = slice(south, north)
+        lon = slice(west, east)
+    else:
+        print ("ERROR: Option location contains an invalid number of arguments ", location)
+        print_usage()
+        exit()    
+    #Call merra2.py    
+    try:
+        get_merra2_data(collection, username, password, output_dir, start_time, end_time, variables, location)
     except RuntimeError as err:
         logger.error(str(err))
         raise click.ClickException(err)

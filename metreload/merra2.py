@@ -9,25 +9,14 @@ import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
 
-
 DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
-#TODO: Make these command line options
-LAT, LON = (47.302765165, 7.100761435)
-START_TIME = '1980-01-01'
-END_TIME = '1980-01-02'
-VARIABLES = ['tlml', 'ulml', 'vlml']
-
 def get_merra2_data(collection, username, password,
-                    savedir,
-                    lat=LAT, lon=LON,
-                    start_time=START_TIME, end_time=END_TIME,
-                    variables=VARIABLES):
+                    savedir,start_time, end_time,variables,
+                    location):
     """Convenience function for downloading MERRA-2 data"""
-    #TODO: Remove defaults
-
     with MERRA2Dataset(collection, username, password) as dataset:
-        dataset.subset(location=(lat, lon),
+        dataset.subset(location,
                        start_time=start_time, end_time=end_time,
                        variables=variables)
         dataset.to_netcdf(savedir)
@@ -164,24 +153,20 @@ class MERRA2Dataset(object):
             subset_ds = subset_ds.sel(time=slice(start_time, end_time))
 
         # Subset location
-        if location is not None:
-            if len(location) == 2:  # TODO: List of points?
-                lat, lon = location
-                assert lat > -90 and lat < 90  # TODO: Better error messages
-                assert lon > -180 and lon < 180
-            elif len(location) == 4:
-                west, east, south, north = location
-                assert (west < east and south < north)  # TODO: better error messages
-                assert all(lon > -180 and lon < 180 for lon in (west, east))
-                assert all(lat > -90 and lat < 90 for lat in (south, north))
-                lat = slice(south, north)
-                lon = slice(west, east)
-            else:
-                raise RuntimeError("Wrong number of location arguments.")
-
-            subset_ds = subset_ds.sel(lat=lat, lon=lon, 
+        if location is None:
+            raise RuntimeError("Wrong number of location arguments.")
+        elif len(location)==2:
+            lat, lon = location 
+        elif len(location)==4:
+            north, west, south, east = location
+            lat = slice(south, north)
+            lon = slice(west, east)
+        else:
+            raise RuntimeError("Wrong number of location arguments.")
+        
+        # print("lat",lat,"\nlon",lon)
+        subset_ds = subset_ds.sel(lat=lat, lon=lon, 
                                       method='nearest', drop=True)
-
         self._subset_ds = subset_ds
 
 
