@@ -28,7 +28,7 @@ def get_merra2_data(collection, username, password,
     """Convenience function for downloading MERRA-2 data"""
     #TODO: Remove defaults
 
-    with MERRA2Dataset(collection, username, password) as dataset:
+    with MERRA2Dataset.open(collection, username, password) as dataset:
         dataset.subset(location=(lat, lon),
                        start_time=start_time, end_time=end_time,
                        variables=variables)
@@ -39,9 +39,41 @@ class MERRA2Dataset(object):
     """Class for MERRA-2 datasets
     """
 
-    def __init__(self, collection, username, password,
-                 base_url=DODS_URL):
+    def __init__(self, ds):
         """
+        Parameters
+        ----------
+        ds : xarray.Dataset
+        """
+        self._ds = ds
+
+        # Initially subset equals the whole data
+        logger.debug("Making a subset copy")
+        self._subset_ds = ds.copy()
+
+        # Get coordinates and variables for this collection
+        self._coords = [coord for coord in ds.coords
+                        if len(ds.coords[coord]) > 1]
+        self._variables = list(ds.data_vars)
+
+    def __del__(self):
+        self._subset_ds.close()
+        self._ds.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.__del__()
+
+    def close(self):
+        """Close the dataset"""
+        self.__del__()
+
+    @staticmethod
+    def open(collection, username, password, base_url=DODS_URL):
+        """Open a MERRA-2 data collection
+
         Parameters
         ----------
         collection : str
@@ -53,67 +85,39 @@ class MERRA2Dataset(object):
             Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
         """
 
-        # Initialize with empty data
-        self._ds = xa.Dataset()
-        self._subset_ds = self._ds
-        self._session = requests.Session()
-        self._store = PydapDataStore(xa.Dataset())
-
         # Initialize session and open dataset
         url = '/'.join((base_url, collection.upper()))
         logger.debug("Setting up session to %s as %s", url, username)
         try:
-            self._session = setup_session(username, password, check_url=url)
+            session = setup_session(username, password, check_url=url)
         except Exception:
             err_str = "Unable to set up session to {} with username {}.".format(url, username)
             raise RuntimeError(err_str)
 
         logger.debug("Opening Pydap data store")
         try:
-            self._store = PydapDataStore.open(url, session=self._session)
+            store = PydapDataStore.open(url, session=session)
         except Exception:
-            self._session.close()
+            session.close()
             raise RuntimeError("Invalid url '{}'".format(url))
 
         logger.debug("Opening dataset")
         try:
-            self._ds = xa.open_dataset(self._store, chunks=TIME_CHUNKS)
+            dataset = xa.open_dataset(store, chunks=TIME_CHUNKS)
         except HTTPError:
-            self._store.close()
-            self._session.close()
             raise RuntimeError("Authentication failed!")
+        finally:
+            store.close()
+            session.close()
 
         # Fix for mysterious `area` variable error
         if collection.upper() == 'M2C0NXASM':
             try:
-                self._ds = self._ds.drop('area')
+                dataset = dataset.drop('area')
             except KeyError:
                 pass
 
-        # Initially subset equals the whole data
-        logger.debug("Making a subset copy")
-        self._subset_ds = self._ds.copy()
-
-        # Get coordinates and variables for this collection
-        self._coords = [coord for coord in self._ds.coords
-                        if len(self._ds.coords[coord]) > 1]
-        self._variables = list(self._ds.data_vars)
-
-    def __del__(self):
-        self._subset_ds.close()
-        self._ds.close()
-        self._store.close()
-        self._session.close()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.__del__()
-
-    def close(self):
-        """Close the dataset"""
-        self.__del__()
+        return MERRA2Dataset(dataset)
 
     def to_netcdf(self, savedir):
         """Save to netCDF4 files
