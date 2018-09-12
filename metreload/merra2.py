@@ -18,6 +18,8 @@ START_TIME = '1980-01-01'
 END_TIME = '1980-01-02'
 VARIABLES = ['tlml', 'ulml', 'vlml']
 
+TIME_CHUNKS = {'time': 24}
+
 def get_merra2_data(collection, username, password,
                     savedir,
                     lat=LAT, lon=LON,
@@ -70,21 +72,20 @@ class MERRA2Dataset(object):
         try:
             self._store = PydapDataStore.open(url, session=self._session)
         except Exception:
-            raise RuntimeError("Invalid url {}".format(url))
-        finally:
             self._session.close()
+            raise RuntimeError("Invalid url '{}'".format(url))
 
         logger.debug("Opening dataset")
         try:
-            self._ds = xa.open_dataset(self._store, chunks={'time': 24})
+            self._ds = xa.open_dataset(self._store, chunks=TIME_CHUNKS)
         except HTTPError:
-            raise RuntimeError("Authentication failed!")
-        finally:
             self._store.close()
             self._session.close()
+            raise RuntimeError("Authentication failed!")
 
         # Initially subset equals the whole data
-        self._subset_ds = self._ds
+        logger.debug("Making a subset copy")
+        self._subset_ds = self._ds.copy()
 
         # Get coordinates and variables for this collection
         self._coords = [coord for coord in self._ds.coords
@@ -92,8 +93,8 @@ class MERRA2Dataset(object):
         self._variables = list(self._ds.data_vars)
 
     def __del__(self):
-        self._subset_ds = None
-        self._ds = None
+        self._subset_ds.close()
+        self._ds.close()
         self._store.close()
         self._session.close()
 
@@ -101,6 +102,10 @@ class MERRA2Dataset(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.__del__()
+
+    def close(self):
+        """Close the dataset"""
         self.__del__()
 
     def to_netcdf(self, savedir):
@@ -179,7 +184,7 @@ class MERRA2Dataset(object):
             if 'time' in self._coords:
                 subset_ds = subset_ds.sel(time=slice(start_time, end_time))
             else:
-                logger.warn("Trying to time subset a time-invariant collection, ignoring")
+                logger.warning("Trying to time subset a time-invariant collection, ignoring")
 
         # Subset location
         if location is not None:
@@ -191,16 +196,16 @@ class MERRA2Dataset(object):
                     kwargs = dict(method='nearest')
                 elif len(location) == 4:
                     west, east, south, north = location
-                    assert (west < east and south < north)  # TODO: better error messages
-                    assert all(lon > -180 and lon < 180 for lon in (west, east))
-                    assert all(lat > -90 and lat < 90 for lat in (south, north))
+                    assert (west <= east and south <= north)  # TODO: better error messages
+                    assert all(lon >= -180 and lon <= 180 for lon in (west, east))
+                    assert all(lat >= -90 and lat <= 90 for lat in (south, north))
                     lat = slice(south, north)
                     lon = slice(west, east)
                     kwargs = dict()
                 else:
                     raise RuntimeError("Wrong number of location arguments.")
             else:
-                logger.warn("Trying to location subset a location-invariant collection, ignoring")
+                logger.warning("Trying to location subset a location-invariant collection, ignoring")
 
             subset_ds = subset_ds.sel(lat=lat, lon=lon, **kwargs)
 
