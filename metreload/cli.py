@@ -59,13 +59,12 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
     args, _, _, values = inspect.getargvalues(frame)    
     errmsg=""
     str_call="Executing command:\nmerra2 "
-    #for (key,value) in mylocals:
     for i in args:   
         if str(i)=="password":
             str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
         else:
             str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
-        if values[i] is (None or ""):            
+        if values[i] is None or values[i] is "":            
             errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)
             click.echo(errmsg)
             print_usage()
