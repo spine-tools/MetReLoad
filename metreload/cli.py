@@ -12,13 +12,15 @@ import click
 import ast
 
 from metreload.merra2 import get_merra2_data
+from metreload.gis import get_shapefile_bbox
 
 
 def print_usage():
     click.echo("\nExample usage:\n merra2 --collection=M2T1NXFLX --username=<to_be_defined> --password=<to_be_defined> --start_time=\"1980-01-01\"" \
     "\n        --end_time=\"1980-01-02\" --variables=\"['tlml', 'ulml', 'vlml']\" --location=\"[60.2, 24.5,60.1, 24.7]\"")
     click.echo("Note that latitude(lat), longitude(lon) is specified as follows:\n location=[<lat-north>,<lon-west>] or" \
-               "\n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] ")
+               "\n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] or" \
+               "\n location=\"C:\myshapefile.shp\"")
        
 def print_help(ctx):    
     click.echo(ctx.get_help())
@@ -40,9 +42,10 @@ def cli(ctx, debug):
 
 @cli.command()
 @click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)")
-@click.option('-U', '--username', default=getuser)
-@click.option('--password', default='')
-@click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir)
+@click.option('-U', '--username', default=getuser(), show_default=True)
+@click.option('--password', default=' ')
+@click.option('-o', '--output-dir', help="Output directory", 
+              default=os.path.curdir, metavar='PATH', show_default=True)
 @click.option('--start_time', default='1980-01-01')
 @click.option('--end_time', default='1980-01-02')
 @click.option('--variables', default= "['tlml', 'ulml', 'vlml']")
@@ -64,7 +67,7 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
             break
             exit() 
             
-    click.echo("Downloading started")
+    click.echo("Download started")
     #Parse variables
     try:
         variables= ast.literal_eval(variables)
@@ -72,29 +75,28 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
         print ("ERROR: Option variables is invalid ", variables)
         print_usage()
         exit()
-    #Parse location    
-    try:
-        location= ast.literal_eval(location)
-    except SyntaxError:
-        print ("ERROR: Option location is invalid ", location)
-        print_usage()
-        exit()  
-    if len(location)==2:
-        lat=location[0]
-        lon=location[1]
-        assert lat > -90 and lat < 90  # TODO: Better error messages
-        assert lon > -180 and lon < 180        
-    elif len(location)==4:
-        #west, east, south, north = location
-        north, west, south, east = location
-        assert (west < east and south < north)  # TODO: better error messages
-        assert all(lon > -180 and lon < 180 for lon in (west, east))
-        assert all(lat > -90 and lat < 90 for lat in (south, north))
+    #Parse location
+    
+    
+    if os.path.isfile(location):
+        location = get_shapefile_bbox(location)
+        #click.echo("Extents are {}".format(extents))  #TODO: Do something meaningful
+    else:
+        try:
+            location= ast.literal_eval(location)
+        except SyntaxError:
+            print ("ERROR: Option location is invalid ", location)
+            print_usage()
+            exit()              
+    if len(location)==2 or len(location)==4:
+        location=tuple(location)
     else:
         print ("ERROR: Option location contains an invalid number of arguments ", location)
         print_usage()
-        exit()    
-    #Call merra2.py    
+        exit()          
+    #Call merra2.py
+    print("location",location, type(location))    
+    #exit()
     try:
         get_merra2_data(collection, username, password, output_dir, start_time, end_time, variables, location)
     except RuntimeError as err:
