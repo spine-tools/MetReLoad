@@ -11,6 +11,7 @@ from logzero import logger
 import click
 
 from metreload.merra2 import get_merra2_data
+from metreload.gis import get_shapefile_bbox
 
 
 def print_help(ctx):
@@ -37,8 +38,13 @@ def cli(ctx, debug):
 @click.option('-U', '--username', default=getuser)
 @click.option('--password', default=' ')
 @click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir)
-def merra2(collection, username, password, output_dir):
+@click.option('-E', '--extents', 'extents_shp', help="Get extents from a shapefile layer",
+              type=str, default=None)
+def merra2(collection, username, password, output_dir, extents_shp):
     click.echo("Downloading MERRA-2 data . . .")
+    if extents_shp is not None:
+        extents = get_shapefile_bbox(extents_shp)
+        click.echo("Extents are {}".format(extents))  #TODO: Do something meaningful
     try:
         get_merra2_data(collection, username, password, output_dir)
     except RuntimeError as err:
