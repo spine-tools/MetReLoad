@@ -48,13 +48,9 @@ def cli(ctx, debug):
 @click.option('--variables', default= "['tlml', 'ulml', 'vlml']")
 @click.option('--location', default= "[60.2, 24.5,60.1, 24.7]")
 
-def merra2(collection, username, password, output_dir, start_time, end_time, variables,location):
-    click.echo("Download MERRA-2 data")
-   
-    #click.echo("with options")
-    #used_options=str(locals())
-    #click.echo(used_options)
-    #click.echo("\n")
+def merra2(collection, username, password, output_dir, start_time, end_time, variables, location):    
+    
+    click.echo("Download MERRA-2 data\n")
     
     #Check input arguments
     for (key,value) in locals().items():
@@ -67,6 +63,8 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
             print_usage()
             break
             exit() 
+            
+    click.echo("Downloading started")
     #Parse variables
     try:
         variables= ast.literal_eval(variables)

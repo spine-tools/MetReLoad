@@ -66,8 +66,9 @@ class MERRA2Dataset(object):
         logger.debug("Opening dataset")
         try:
             self._ds = xa.open_dataset(self._store, chunks={'time': 24})
-        except HTTPError:
-            raise RuntimeError("Authentication failed!")
+        except HTTPError:            
+            raise RuntimeError("Authentication failed!\n Hint: check that \"NASA GESDISC DATA ARCHIVE\"" \
+                               " app is authorized for your account at https://urs.earthdata.nasa.gov")
         finally:
             self._store.close()
             self._session.close()
