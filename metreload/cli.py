@@ -35,11 +35,12 @@ def cli(ctx, debug):
 @cli.command()
 @click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)",
               required=True)
-@click.option('-U', '--username', default=getuser)
+@click.option('-U', '--username', default=getuser(), show_default=True)
 @click.option('--password', default=' ')
-@click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir)
+@click.option('-o', '--output-dir', help="Output directory", 
+              default=os.path.curdir, metavar='PATH', show_default=True)
 @click.option('-E', '--extents', 'extents_shp', help="Get extents from a shapefile layer",
-              type=str, default=None)
+              type=str, default=None, metavar='PATH')
 def merra2(collection, username, password, output_dir, extents_shp):
     click.echo("Downloading MERRA-2 data . . .")
     if extents_shp is not None:

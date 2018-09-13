@@ -35,10 +35,12 @@ Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see 
 
 ##### Options
 ```
--c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code) [required]
--U, --user TEXT        Username (defaults to current user)
---password TEXT        Password 
--o, --output-dir TEXT  Output directory
+-c, --collection TEXT  Name of MERRA-2 collection 
+                       (nine-character ESDT code) [required]
+-U, --username TEXT    [default: <system username>]
+--password TEXT
+-o, --output-dir PATH  Output directory  [default: .]
+-E, --extents PATH     Get extents from a shapefile layer
 --help                 Show this message and exit.
 ```
 
