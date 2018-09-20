@@ -34,6 +34,10 @@ from metreload.gis import get_shapefile_bbox
 def print_help(ctx):
     click.echo(ctx.get_help())
 
+def print_usage(ctx, hint=True):
+    click.echo(ctx.get_usage())
+    if hint:
+        click.echo("\nTry `metreload COMMAND --help` for more options")
 
 @click.group(invoke_without_command=True)
 @click.version_option()
@@ -44,6 +48,8 @@ def cli(ctx, debug):
     if debug:
         click.echo("Debug mode ON")
         logzero.loglevel(logging.DEBUG)
+    else:
+        logzero.loglevel(logging.INFO)
 
     if ctx.invoked_subcommand is None:
         print_help(ctx)

@@ -1,7 +1,6 @@
 # TODO notes for MetReLoad
 
 ## Fix
-- Only show debug messages if debug mode is on
 - Case if area is over 180° longitude or around the poles or if user request whole world except area
 
 ## Add
