@@ -48,8 +48,9 @@ def cli(ctx, debug):
 @click.option('-o', '--output_dir', help="Output directory", default=os.path.curdir, metavar='PATH', show_default=True)
 @click.option('--start_time', default="1980-01-01")
 @click.option('--end_time', default="1980-01-02")
-@click.option('--variables', default= "['tlml', 'ulml', 'vlml']")
-@click.option('--location', default= "[60.2, 24.5,60.1, 24.7]")
+@click.option('--variables', default= "tlml, ulml, vlml")
+@click.option('--location', default= "60.2, 24.5,60.1, 24.7")
+
 
 
 def merra2(collection, username, password, output_dir, start_time, end_time, variables, location):       
@@ -83,7 +84,7 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
     
     #Parse variables
     try:
-        variables= ast.literal_eval(variables)
+        variables=[x.strip() for x in variables.split(',')]
     except (ValueError, SyntaxError):
         errmsg="ERROR: Option variables=\""+str(variables)+"\" is invalid."
         click.echo(errmsg)
@@ -106,7 +107,7 @@ def merra2(collection, username, password, output_dir, start_time, end_time, var
         #click.echo("Extents are {}".format(extents))  #TODO: Do something meaningful
     else:
         try:
-            location= ast.literal_eval(location)
+            location=[float(x) for x in location.split(',')]
         except (ValueError, SyntaxError):
             errmsg="ERROR: Option location=\""+str(location)+"\" is invalid."
             click.echo(errmsg)            
