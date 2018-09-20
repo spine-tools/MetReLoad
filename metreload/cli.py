@@ -49,17 +49,21 @@ def cli(ctx, debug):
         print_help(ctx)
 
 
-@cli.command()
+@cli.command('merra2', short_help="Get MERRA-2 data")
 @click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)",
-              required=True)
+              default=None)
 @click.option('-U', '--username', default=getuser(), show_default=True)
 @click.option('--password', default=' ')
 @click.option('-o', '--output-dir', help="Output directory", 
               default=os.path.curdir, metavar='PATH', show_default=True)
 @click.option('-E', '--extents', 'extents_shp', help="Get extents from a shapefile layer",
               type=str, default=None, metavar='PATH')
-def merra2(collection, username, password, output_dir, extents_shp):
-    click.echo("Downloading MERRA-2 data . . .")
+@click.pass_context
+def merra2(ctx, collection, username, password, output_dir, extents_shp):
+    if collection is None:
+        raise click.UsageError("Missing collection name")
+    else:
+        click.echo("Downloading MERRA-2 data . . .")
     if extents_shp is not None:
         extents = get_shapefile_bbox(extents_shp)
         click.echo("Extents are {}".format(extents))  #TODO: Do something meaningful
