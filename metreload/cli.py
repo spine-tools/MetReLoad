@@ -5,13 +5,11 @@ import sys
 import os.path
 import logging
 from getpass import getuser
+from datetime import datetime
 
 import logzero
 from logzero import logger
 import click
-import ast
-import inspect
-import datetime
 
 from metreload.merra2 import get_merra2_data
 from metreload.gis import get_shapefile_bbox
@@ -45,90 +43,75 @@ def cli(ctx, debug):
 @click.option('-c', '--collection', help="Name of MERRA-2 collection (nine-character ESDT code)")
 @click.option('-U', '--username', default=getuser(), show_default=True)
 @click.option('--password', default=" ")
-@click.option('-o', '--output_dir', help="Output directory", default=os.path.curdir, metavar='PATH', show_default=True)
-@click.option('--start_time', default="1980-01-01")
-@click.option('--end_time', default="1980-01-02")
-@click.option('--variables', default= "tlml, ulml, vlml")
-@click.option('--location', default= "60.2, 24.5,60.1, 24.7")
+@click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir, metavar='PATH', show_default=True)
+@click.option('--start-time', default=None, help="Start date (YYYY-MM-DD)")
+@click.option('--end-time', default=None, help="End date (YYYY-MM-DD)")
+@click.option('--variables', default="*", help="Comma separated list of variable names")
+@click.option('--location', default="", help="Comma separated list of coordinates either lat,lon or north,west,south,east")
+@click.pass_context
+def merra2(ctx, collection, username, password, output_dir, start_time, end_time, variables, location):       
+    if collection is None:
+        raise click.UsageError("Missing collection name")
 
+    # TODO: Check if this is needed
+    # frame = inspect.currentframe()
+    # args, _, _, values = inspect.getargvalues(frame)    
+    # errmsg=""
+    # str_call="Executing command:\nmerra2 "
+    # for i in args:   
+    #     if str(i)=="password":
+    #         str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
+    #     else:
+    #         str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
+    #     if values[i] is None or values[i] is "":            
+    #         errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)
+    #         click.echo(errmsg)
+    #         print_usage(ctx)
+    #         raise click.ClickException("Abort, search log for keyword ERROR")            
+    # click.echo(str_call+"\n")
 
-
-def merra2(collection, username, password, output_dir, start_time, end_time, variables, location):       
-    #Check input arguments    
-    click.echo("Download MERRA-2 data\n")
-    frame = inspect.currentframe()
-    args, _, _, values = inspect.getargvalues(frame)    
-    errmsg=""
-    str_call="Executing command:\nmerra2 "
-    for i in args:   
-        if str(i)=="password":
-            str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
-        else:
-            str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
-        if values[i] is None or values[i] is "":            
-            errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)
-            click.echo(errmsg)
-            print_usage()
-            raise click.ClickException("Abort, search log for keyword ERROR")            
-    click.echo(str_call+"\n")
-    
     #Parse dates
-    for option_name, date_text in enumerate(([start_time, end_time])):
+    for date_text in [start_time, end_time]:
         try:
-            datetime.datetime.strptime(date_text, '%Y-%m-%d')
+            datetime.strptime(date_text, '%Y-%m-%d')
         except ValueError:
-            errmsg="ERROR: Option "+str(option_name)+"=\""+str(date_text)+"\" is invalid, should be YYYY-MM-DD"
+            errmsg = "Option '{}' is invalid, should be YYYY-MM-DD".format(date_text)
             click.echo(errmsg)
-            print_usage()
-            raise click.ClickException("Abort, search log for keyword ERROR")
-    
+            print_usage(ctx)
+            raise click.BadParameter(errmsg)
+        except TypeError:
+            raise click.UsageError("Start or end time missing")
+
     #Parse variables
     try:
-        variables=[x.strip() for x in variables.split(',')]
-    except (ValueError, SyntaxError):
-        errmsg="ERROR: Option variables=\""+str(variables)+"\" is invalid."
-        click.echo(errmsg)
-        print_usage()
-        raise click.ClickException("Abort, search log for keyword ERROR")    
-    if type(variables) is not list:
-        errmsg="ERROR: Option variables=\""+str(variables)+"\" is invalid. Hint: Square bracket notation [] required."
-        click.echo(errmsg)            
-        print_usage()    
-        raise click.ClickException("Abort, search log for keyword ERROR")
-    elif not (all(isinstance(n, str) for n in variables)):
-        errmsg="ERROR: Option variables=\""+str(variables)+"\" is invalid. Hint: String notation required ['element1','element2'] required."
-        click.echo(errmsg)            
-        print_usage()   
-        raise click.ClickException("Abort, search log for keyword ERROR")
+        variables_list = [x.strip() for x in variables.split(',')]
+    except:
+        errmsg = "Option variables=\""+str(variables)+"\" is invalid."
+        print_usage(ctx)
+        raise click.BadParameter(errmsg, param_hint='variables')
 
     #Parse location
     if os.path.isfile(location):
-        location = get_shapefile_bbox(location)
-        #click.echo("Extents are {}".format(extents))  #TODO: Do something meaningful
+        try:
+            coords = get_shapefile_bbox(location)
+        except RuntimeError:
+            raise click.BadParameter("Could not derive location form shapefile", param_hint='location')
     else:
         try:
-            location=[float(x) for x in location.split(',')]
-        except (ValueError, SyntaxError):
-            errmsg="ERROR: Option location=\""+str(location)+"\" is invalid."
-            click.echo(errmsg)            
-            print_usage()
-            raise click.ClickException("Abort, search log for keyword ERROR")   
-        if type(location) is not list:
-            errmsg="ERROR: Option location=\""+str(location)+"\" is invalid. Hint: Square bracket notation [] required."
-            click.echo(errmsg)            
-            print_usage()
-            raise click.ClickException("Abort, search log for keyword ERROR")           
-    if len(location)==2 or len(location)==4:
-        location=tuple(location)
-    else:
-        errmsg="ERROR: Option location contains an invalid number of arguments "+str(location)
+            coords = tuple([float(x) for x in location.split(',')])
+        except ValueError:
+            errmsg = "Option location=\""+str(location)+"\" is invalid."
+            print_usage(ctx)
+            raise click.BadParameter(errmsg, param_hint='location')
+    if len(coords) not in (2, 4):
+        errmsg = "Option location contains an invalid number of arguments " + str(location)
         click.echo(errmsg)
-        print_usage()
-        raise click.ClickException("Abort, search log for keyword ERROR")
-    
-    #Call merra2.py
+        print_usage(ctx)
+        raise click.BadParameter(errmsg, param_hint='location')
+
+    click.echo("Downloading MERRA-2 data . . .")
     try:
-        get_merra2_data(collection, username, password, output_dir, start_time, end_time, variables, location)
+        get_merra2_data(collection, username, password, output_dir, start_time, end_time, variables_list, coords)
     except RuntimeError as err:
         logger.error(str(err))
         raise click.ClickException(err)
