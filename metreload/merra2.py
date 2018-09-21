@@ -179,22 +179,21 @@ class MERRA2Dataset(object):
         end_time : str
             See above.
         variables : list
-            List of variables to include, or '*' to include all
+            List of variables to include, or None to include all
         """
-        subset_ds = self._subset_ds
 
         logger.debug("Subsetting dataset")
+        subset_ds = self._subset_ds
+        
+        # Select variables
         if variables is not None:
-            if variables == '*':
-                variables_to_get = self._variables
-            else:
-                variables_to_get = list()
-                for var in variables:
-                    varname = var.lower()
-                    if varname in self._variables:
-                        variables_to_get.append(varname)
-                    else:
-                        logger.warning("Unknown variable '%s'", var)
+            variables_to_get = list()
+            for var in variables:
+                varname = var.lower()
+                if varname in self._variables:
+                    variables_to_get.append(varname)
+                else:
+                    logger.warning("Unknown variable '%s'", var)
             if variables_to_get:
                 subset_ds = self._ds[variables_to_get]
             else:

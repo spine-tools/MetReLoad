@@ -72,9 +72,9 @@ Before committing, run tests with
 
 PyInstaller version 3.4 is required. Excute 
 
-    pyinstaller metreload.spec
+    pyinstaller [-y] metreload.spec
 
-to build an executable distribution into `dist/metreload`.
+to build an executable distribution into `dist/metreload`. (Use the `-y` switch to bypass confirmation for replacing old files.)
 
 &nbsp;
 <hr>

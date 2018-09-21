@@ -76,11 +76,11 @@ def cli(ctx, debug):
 @click.option('--password', default=" ")
 @click.option('-o', '--output-dir', help="Output directory", metavar='PATH',
               default=os.path.curdir, show_default=True)
-@click.option('--start-time', default=None, help="Start date (YYYY-MM-DD)", metavar='DATE')
-@click.option('--end-time', default=None, help="End date (YYYY-MM-DD)", metavar='DATE')
-@click.option('--variables', default="*", help="Comma separated list of variable names",
-              metavar='LIST')
-@click.option('--location', default="", metavar='ARG',
+@click.option('--start-time', help="Start date (YYYY-MM-DD)", metavar='DATE', required=True)
+@click.option('--end-time', help="End date (YYYY-MM-DD)", metavar='DATE', required=True)
+@click.option('--variables', help="Comma separated list of variable names",
+              metavar='LIST', default=None)
+@click.option('--location', default=None, metavar='ARG', required=True,
               help="Comma separated list of coordinates either (lat,lon or north,west,south,east)"
                    "or path to shapefile")
 @click.pass_context
@@ -120,12 +120,15 @@ def merra2(ctx, collection, username, password, output_dir,
             raise click.UsageError("Start or end time missing")
 
     #Parse variables
-    try:
-        variables_list = [x.strip() for x in variables.split(',')]
-    except:
-        errmsg = "Option 'variables={}' is invalid.".format(variables)
-        print_usage(ctx)
-        raise click.BadParameter(errmsg, param_hint='variables')
+    if variables is not None:
+        try:
+            variables_list = [x.strip() for x in variables.split(',')]
+        except:
+            errmsg = "Option 'variables={}' is invalid.".format(variables)
+            print_usage(ctx)
+            raise click.BadParameter(errmsg, param_hint='variables')
+    else:
+        variables_list = None
 
     #Parse location
     if os.path.isfile(location):
