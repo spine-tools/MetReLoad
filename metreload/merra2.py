@@ -29,27 +29,16 @@ import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
 
-
 DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
-
-#TODO: Make these command line options
-LAT, LON = (47.302765165, 7.100761435)
-START_TIME = '1980-01-01'
-END_TIME = '1980-01-02'
-VARIABLES = ['tlml', 'ulml', 'vlml']
 
 TIME_CHUNKS = {'time': 24}
 
 def get_merra2_data(collection, username, password,
-                    savedir,
-                    lat=LAT, lon=LON,
-                    start_time=START_TIME, end_time=END_TIME,
-                    variables=VARIABLES):
+                    savedir,start_time, end_time,variables,
+                    location):
     """Convenience function for downloading MERRA-2 data"""
-    #TODO: Remove defaults
-
     with MERRA2Dataset.open(collection, username, password) as dataset:
-        dataset.subset(location=(lat, lon),
+        dataset.subset(location,
                        start_time=start_time, end_time=end_time,
                        variables=variables)
         dataset.to_netcdf(savedir)
@@ -124,8 +113,10 @@ class MERRA2Dataset(object):
         logger.debug("Opening dataset")
         try:
             dataset = xa.open_dataset(store, chunks=TIME_CHUNKS)
-        except HTTPError:
-            raise RuntimeError("Authentication failed!")
+        except HTTPError:            
+            raise RuntimeError("Authentication failed!\n Hint: check that \"NASA GESDISC DATA ARCHIVE\"" \
+                               " app is authorized for your account at https://urs.earthdata.nasa.gov")
+
         finally:
             store.close()
             session.close()
@@ -182,7 +173,7 @@ class MERRA2Dataset(object):
         Parameters
         ----------
         location : tuple
-            Location in the form of tuple (lat, lon) or (west, east, south, north)
+            Location in the form of tuple (lat, lon) or (north, west, south, east)
             coordinates in WGS84 system.
         start_time : str
             Timestamp in the form YYYY-MM-DDTHH
@@ -226,7 +217,7 @@ class MERRA2Dataset(object):
                     assert lon > -180 and lon < 180
                     kwargs = dict(method='nearest')
                 elif len(location) == 4:
-                    west, east, south, north = location
+                    north, west, south, east = location
                     assert (west <= east and south <= north)  # TODO: better error messages
                     assert all(lon >= -180 and lon <= 180 for lon in (west, east))
                     assert all(lat >= -90 and lat <= 90 for lat in (south, north))

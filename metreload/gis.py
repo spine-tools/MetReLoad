@@ -24,5 +24,6 @@ def get_shapefile_bbox(file_path):
         sf = shapefile.Reader(file_path)
     except shapefile.ShapefileException as err:
         raise RuntimeError(err)
-    
-    return tuple([sf.bbox[0], sf.bbox[2], sf.bbox[1], sf.bbox[3]])
+ 
+    return tuple([sf.bbox[3], sf.bbox[0], sf.bbox[1], sf.bbox[2]])
+
