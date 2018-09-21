@@ -7,7 +7,7 @@
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,17 +33,22 @@ from metreload.gis import get_shapefile_bbox
 
 
 def print_usage(ctx, hint=True):
+    """Print usage instructions for given context"""
     click.echo(ctx.get_usage())
-    click.echo("\nExample usage:\n merra2 --collection=M2T1NXFLX --username=<to_be_defined> --password=<to_be_defined> --start_time=\"1980-01-01\"" \
-               " --end_time=\"1980-01-02\" --variables=\"['tlml', 'ulml', 'vlml']\" --location=\"[60.2, 24.5,60.1, 24.7]\"")
-    click.echo("\nNote that latitude(lat), longitude(lon) is specified as follows:\n location=[<lat-north>,<lon-west>] or" \
-               "\n location=[<lat-north>,<lon-west>,<lat-south>,<lon-east>] or" \
-               "\n location=\"<path-to-shape-file>\"\n")
+    click.echo("""\nExample usage:\n
+               merra2 --collection=M2T1NXFLX --username=<to_be_defined>
+               --password=<to_be_defined> --start_time=1980-01-01
+               --end_time=1980-01-02 --variables=tlml,ulml,vlml --location=60.2,24.5,60.1,24.7""")
+    click.echo("""\nNote that latitude (lat), longitude (lon) is specified as follows:\n
+               location=<lat-north>,<lon-west> or\n
+               location=<lat-north>,<lon-west>,<lat-south>,<lon-east> or\n
+               location=<path-to-shape-file>""")
     if hint:
         click.echo("\nTry `metreload COMMAND --help` for more options")
 
 
-def print_help(ctx):    
+def print_help(ctx):
+    """Print help for given context"""
     click.echo(ctx.get_help())
     print_usage(ctx, hint=False)
 
@@ -69,31 +74,35 @@ def cli(ctx, debug):
               default=None)
 @click.option('-U', '--username', default=getuser(), show_default=True)
 @click.option('--password', default=" ")
-@click.option('-o', '--output-dir', help="Output directory", default=os.path.curdir, metavar='PATH', show_default=True)
+@click.option('-o', '--output-dir', help="Output directory", metavar='PATH',
+              default=os.path.curdir, show_default=True)
 @click.option('--start-time', default=None, help="Start date (YYYY-MM-DD)")
 @click.option('--end-time', default=None, help="End date (YYYY-MM-DD)")
 @click.option('--variables', default="*", help="Comma separated list of variable names")
-@click.option('--location', default="", help="Comma separated list of coordinates either lat,lon or north,west,south,east")
+@click.option('--location', default="",
+              help="Comma separated list of coordinates either lat,lon or north,west,south,east")
 @click.pass_context
-def merra2(ctx, collection, username, password, output_dir, start_time, end_time, variables, location):       
+def merra2(ctx, collection, username, password, output_dir,
+           start_time, end_time, variables, location):
+    """Command for downloading MERRA-2 data"""
     if collection is None:
         raise click.UsageError("Missing collection name")
 
     # TODO: Check if this is needed
     # frame = inspect.currentframe()
-    # args, _, _, values = inspect.getargvalues(frame)    
+    # args, _, _, values = inspect.getargvalues(frame)
     # errmsg=""
     # str_call="Executing command:\nmerra2 "
-    # for i in args:   
+    # for i in args:
     #     if str(i)=="password":
     #         str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
     #     else:
     #         str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
-    #     if values[i] is None or values[i] is "":            
-    #         errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)
+    #     if values[i] is None or values[i] is "":
+    #         errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)  pylint: disable=C0301
     #         click.echo(errmsg)
     #         print_usage(ctx)
-    #         raise click.ClickException("Abort, search log for keyword ERROR")            
+    #         raise click.ClickException("Abort, search log for keyword ERROR")
     # click.echo(str_call+"\n")
 
     #Parse dates
@@ -112,7 +121,7 @@ def merra2(ctx, collection, username, password, output_dir, start_time, end_time
     try:
         variables_list = [x.strip() for x in variables.split(',')]
     except:
-        errmsg = "Option variables=\""+str(variables)+"\" is invalid."
+        errmsg = "Option 'variables={}' is invalid.".format(variables)
         print_usage(ctx)
         raise click.BadParameter(errmsg, param_hint='variables')
 
@@ -121,7 +130,8 @@ def merra2(ctx, collection, username, password, output_dir, start_time, end_time
         try:
             coords = get_shapefile_bbox(location)
         except RuntimeError:
-            raise click.BadParameter("Could not derive location form shapefile", param_hint='location')
+            raise click.BadParameter("Could not derive location form shapefile",
+                                     param_hint='location')
     else:
         try:
             coords = tuple([float(x) for x in location.split(',')])
@@ -130,14 +140,15 @@ def merra2(ctx, collection, username, password, output_dir, start_time, end_time
             print_usage(ctx)
             raise click.BadParameter(errmsg, param_hint='location')
     if len(coords) not in (2, 4):
-        errmsg = "Option location contains an invalid number of arguments " + str(location)
+        errmsg = "Option location contains an invalid number of arguments {}".format(location)
         click.echo(errmsg)
         print_usage(ctx)
         raise click.BadParameter(errmsg, param_hint='location')
 
     click.echo("Downloading MERRA-2 data . . .")
     try:
-        get_merra2_data(collection, username, password, output_dir, start_time, end_time, variables_list, coords)
+        get_merra2_data(collection, username, password, output_dir,
+                        start_time, end_time, variables_list, coords)
     except RuntimeError as err:
         logger.error(str(err))
         raise click.ClickException(err)
@@ -145,8 +156,8 @@ def merra2(ctx, collection, username, password, output_dir, start_time, end_time
         click.echo("Done!")
 
 
-def main():
-    cli(obj={})
+def main():  # pylint: disable=C0111
+    cli(obj={})  # pylint: disable=E1120,E1123
 
 
 if __name__ == "__main__":

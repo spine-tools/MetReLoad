@@ -6,12 +6,12 @@
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Lesser General Public License for more details.
-
+#
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
@@ -24,7 +24,6 @@ import os.path
 from logzero import logger
 from webob.exc import HTTPError
 
-import requests
 import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
@@ -34,8 +33,9 @@ DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 TIME_CHUNKS = {'time': 24}
 
 def get_merra2_data(collection, username, password,
-                    savedir,start_time, end_time,variables,
-                    location):
+                    savedir,
+                    start_time, end_time,
+                    variables, location):
     """Convenience function for downloading MERRA-2 data"""
     with MERRA2Dataset.open(collection, username, password) as dataset:
         dataset.subset(location,
@@ -113,9 +113,11 @@ class MERRA2Dataset(object):
         logger.debug("Opening dataset")
         try:
             dataset = xa.open_dataset(store, chunks=TIME_CHUNKS)
-        except HTTPError:            
-            raise RuntimeError("Authentication failed!\n Hint: check that \"NASA GESDISC DATA ARCHIVE\"" \
-                               " app is authorized for your account at https://urs.earthdata.nasa.gov")
+        except HTTPError:
+            raise RuntimeError("""Authentication failed!\n
+                                  Hint: check that 'NASA GESDISC DATA ARCHIVE'
+                                  app is authorized for your account at
+                                  https://urs.earthdata.nasa.gov""")
 
         finally:
             store.close()
@@ -137,9 +139,6 @@ class MERRA2Dataset(object):
         ----------
         savedir : str
             Path to save files to
-        freq : str, optional
-            Pandas frquency string, default 1 day ('D')
-            (see https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timeseries-offset-aliases)
         """
 
         # Add dates
@@ -149,8 +148,8 @@ class MERRA2Dataset(object):
         dates, datasets = zip(*self._subset_ds.groupby('date'))
         basename = self._ds.attrs['title'].split(':')[0].replace(' ', '.')
         filepaths = [os.path.abspath(os.path.join(savedir,
-                                     '{}.{}.SUB.nc4'.format(basename, date)))
-                    for date in dates]
+                                                  '{}.{}.SUB.nc4'.format(basename, date)))
+                     for date in dates]
         logger.debug("Writing to %s", os.path.abspath(savedir))
         xa.save_mfdataset(datasets, filepaths)
 
@@ -165,7 +164,7 @@ class MERRA2Dataset(object):
         logger.debug("Loading dask array to memory")
         return self._subset_ds.squeeze().load()
 
-    def subset(self, location=None, 
+    def subset(self, location=None,
                start_time=None, end_time=None,
                variables=None):
         """Subset the data accordingly
@@ -196,7 +195,7 @@ class MERRA2Dataset(object):
                         variables_to_get.append(varname)
                     else:
                         logger.warning("Unknown variable '%s'", var)
-            if len(variables_to_get) > 0:
+            if variables_to_get:
                 subset_ds = self._ds[variables_to_get]
             else:
                 raise RuntimeError("No variables selected")
@@ -210,8 +209,8 @@ class MERRA2Dataset(object):
 
         # Subset location
         if location is not None:
-            if set(('lat', 'lon')).issubset(self._coords):
-                if len(location) == 2:  # TODO: List of points?
+            if set(('lat', 'lon')).issubset(self._coords):  # Ensure location dimensions exist
+                if len(location) == 2:
                     lat, lon = location
                     assert lat > -90 and lat < 90  # TODO: Better error messages
                     assert lon > -180 and lon < 180
@@ -227,16 +226,9 @@ class MERRA2Dataset(object):
                 else:
                     raise RuntimeError("Wrong number of location arguments.")
             else:
-                logger.warning("Trying to location subset a location-invariant collection, ignoring")
+                logger.warning("Trying to location subset "
+                               "a location-invariant collection, ignoring")
 
             subset_ds = subset_ds.sel(lat=lat, lon=lon, **kwargs)
 
         self._subset_ds = subset_ds
-
-
-
-
-
-
-
-
