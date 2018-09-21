@@ -35,12 +35,15 @@ Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see 
 
 ##### Options
 ```
--c, --collection TEXT  Name of MERRA-2 collection 
-                       (nine-character ESDT code) [required]
--U, --username TEXT    [default: <system username>]
+-c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code)
+-U, --username TEXT    [default: ererkka]
 --password TEXT
 -o, --output-dir PATH  Output directory  [default: .]
--E, --extents PATH     Get extents from a shapefile layer
+--start-time DATE      Start date (YYYY-MM-DD)
+--end-time DATE        End date (YYYY-MM-DD)
+--variables LIST       Comma separated list of variable names
+--location ARG         Comma separated list of coordinates either (lat,lon
+                       or north,west,south,east)or path to shapefile
 --help                 Show this message and exit.
 ```
 
@@ -55,7 +58,7 @@ Install development requirements into your current Python environment with
 
 Alternatively, if you are using `conda` you can also create a new development environment with
 
-   conda env create --file conda/develop.yml --name <NAME>
+    conda env create --file conda/develop.yml --name <NAME>
 
 Install the package in editable mode with
 

@@ -7,7 +7,7 @@
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,7 +29,7 @@ with open('README.md') as readme_file:
 #with open('HISTORY.md') as history_file:
 #    history = history_file.read()
 
-requirements = ['Click >=6.0', 
+requirements = ['Click >=6.0',
                 'xarray >=0.10.0',
                 'Click >=6.0',
                 'lxml >=4.1.1',

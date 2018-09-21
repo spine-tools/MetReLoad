@@ -76,11 +76,13 @@ def cli(ctx, debug):
 @click.option('--password', default=" ")
 @click.option('-o', '--output-dir', help="Output directory", metavar='PATH',
               default=os.path.curdir, show_default=True)
-@click.option('--start-time', default=None, help="Start date (YYYY-MM-DD)")
-@click.option('--end-time', default=None, help="End date (YYYY-MM-DD)")
-@click.option('--variables', default="*", help="Comma separated list of variable names")
-@click.option('--location', default="",
-              help="Comma separated list of coordinates either lat,lon or north,west,south,east")
+@click.option('--start-time', default=None, help="Start date (YYYY-MM-DD)", metavar='DATE')
+@click.option('--end-time', default=None, help="End date (YYYY-MM-DD)", metavar='DATE')
+@click.option('--variables', default="*", help="Comma separated list of variable names",
+              metavar='LIST')
+@click.option('--location', default="", metavar='ARG',
+              help="Comma separated list of coordinates either (lat,lon or north,west,south,east)"
+                   "or path to shapefile")
 @click.pass_context
 def merra2(ctx, collection, username, password, output_dir,
            start_time, end_time, variables, location):
