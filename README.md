@@ -32,6 +32,7 @@ Use the `-e` switch if you want an editable copy (for development).
 #### `merra2`  
 
 Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see instructions [here](https://disc.gsfc.nasa.gov/data-access).
+Downloaded data will be saved as netCDF-4 files, one file per day, with filenames of format `MERRA-2.<COLLECTION ID>.<DATE>.SUB.nc4`.
 
 ##### Options
 ```
