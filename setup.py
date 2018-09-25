@@ -29,14 +29,13 @@ with open('README.md') as readme_file:
 #with open('HISTORY.md') as history_file:
 #    history = history_file.read()
 
-requirements = ['Click >=6.0',
-                'xarray >=0.10.0',
-                'Click >=6.0',
+requirements = ['Click >=6.7',
+                'xarray >=0.10.8',
                 'lxml >=4.1.1',
                 'logzero >=1.5.0',
                 'cython >=0.28.5',
-                'netcdf4 >= 1.3.1',
-                'dask >=0.16.1',
+                'netcdf4 >=1.3.1',
+                'dask >=0.19.1',
                 'pydap >=3.2.2',
                 'pyshp >=1.2.12']
 
