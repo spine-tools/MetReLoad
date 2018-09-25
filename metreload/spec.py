@@ -15,6 +15,8 @@ BLOCK_CIPHER = None
 UPX = True
 BASENAME = 'metreload'
 
+name_with_version = '{}-{}'.format(BASENAME, version)
+
 # Do analysis
 a = Analysis(['metreload/cli.py'],
              pathex=[],
@@ -32,9 +34,9 @@ a = Analysis(['metreload/cli.py'],
 pyz = PYZ(a.pure, a.zipped_data,
           cipher=BLOCK_CIPHER)
 
-options = dict(name='{}-{}'.format(BASENAME, version),
-               strip=False,
+options = dict(strip=False,
                upx=True)
 
-exe_options = dict(debug=False,
+exe_options = dict(name=BASENAME,
+                   debug=False,
                    console=True)
