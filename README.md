@@ -19,8 +19,7 @@ Use the `-e` switch if you want an editable copy (for development).
 
     metreload [OPTIONS] COMMAND [OPTIONS]...
 
-
-##### General options
+### General options
 
 ```
 --version  Show version and exit
@@ -28,28 +27,7 @@ Use the `-e` switch if you want an editable copy (for development).
 --help     Show this message and exit.
 ```
   
-### Commands  
-#### `merra2`  
-
-Download MERRA-2 data. Note: You first need to register with NASA Earhdata, see instructions [here](https://disc.gsfc.nasa.gov/data-access).
-Downloaded data will be saved as netCDF-4 files, one file per day, with filenames of format `MERRA-2.<COLLECTION ID>.<DATE>.SUB.nc4`.
-
-##### Options
-```
--c, --collection TEXT  Name of MERRA-2 collection (nine-character ESDT code)
--U, --username TEXT    [default: ererkka]
---password TEXT
--o, --output-dir PATH  Output directory  [default: .]
---start-time DATE      Start date (YYYY-MM-DD)
---end-time DATE        End date (YYYY-MM-DD)
---variables LIST       Comma separated list of variable names
---location ARG         Comma separated list of coordinates either (lat,lon
-                       or north,west,south,east)or path to shapefile
---help                 Show this message and exit.
-```
-
-Refer to [MERRA-2 file specification](https://gmao.gsfc.nasa.gov/pubs/docs/Bosilovich785.pdf) for the names of data collections.
-
+See documentation in folder `docs` for more information.
 
 ## Contributing
 

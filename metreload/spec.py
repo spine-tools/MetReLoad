@@ -21,7 +21,8 @@ name_with_version = '{}-{}'.format(BASENAME, version)
 a = Analysis(['metreload/cli.py'],
              pathex=[],
              binaries=[],
-             datas=copy_metadata('pydap'),
+             datas=copy_metadata('pydap')\
+                   + [('docs/_build/html', 'documentation')],
              hiddenimports=['pandas._libs.tslibs.np_datetime',
                             'pandas._libs.skiplist'],
              hookspath=[],
