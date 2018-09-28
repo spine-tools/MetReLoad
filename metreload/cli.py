@@ -81,7 +81,7 @@ def cli(ctx, debug):
 @click.option('--variables', help="Comma separated list of variable names",
               metavar='LIST', default=None)
 @click.option('--location', default=None, metavar='ARG', required=True,
-              help="Comma separated list of coordinates either (lat,lon or north,west,south,east)"
+              help="Comma separated list of coordinates either (lat,lon or north,west,south,east) "
                    "or path to shapefile")
 @click.pass_context
 def merra2(ctx, collection, username, password, output_dir,

@@ -1,8 +1,9 @@
 ###############################################################################
-# MetReLoad - Python application for downloading meteorological reanalysis data
 # Copyright (C) 2018  The Spine Project Authors
 #
-# This program is free software: you can redistribute it and/or modify
+# This file is part of MetReload
+#
+# MetReLoad is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -17,7 +18,7 @@
 ###############################################################################
 
 """
-Command line interface for MetReLoad
+Module for retrieving MERRA-2 data
 """
 
 import os.path
@@ -50,9 +51,9 @@ class MERRA2Dataset(object):
 
     def __init__(self, ds):
         """
-        Parameters
-        ----------
-        ds : xarray.Dataset
+        
+        Args:
+            ds (xarray.Dataset)
         """
         self._ds = ds
 
@@ -83,15 +84,11 @@ class MERRA2Dataset(object):
     def open(collection, username, password, base_url=DODS_URL):
         """Open a MERRA-2 data collection
 
-        Parameters
-        ----------
-        collection : str
-            Earth Science Data Types Name of the collection (9 characters)
-        username : str
-        password : str
-            Password
-        base_url : str, optional
-            Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
+        Args:
+            collection (str): Earth Science Data Types Name of the collection (9 characters)
+            username (str) 
+            password (str)
+            base_url (str, optional): Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
         """
 
         # Initialize session and open dataset
@@ -135,10 +132,8 @@ class MERRA2Dataset(object):
     def to_netcdf(self, savedir):
         """Save to netCDF4 files
 
-        Parameters
-        ----------
-        savedir : str
-            Path to save files to
+        Args:
+            savedir (str): Path to save files to
         """
 
         # Add dates
@@ -155,11 +150,6 @@ class MERRA2Dataset(object):
 
     def to_xarray(self):
         """Convert to xarray Dataset
-
-        Parameters
-        ----------
-        squeeze : bool, optional
-            If ``True``, drops dimesions with length 1
         """
         logger.debug("Loading dask array to memory")
         return self._subset_ds.squeeze().load()
@@ -169,17 +159,12 @@ class MERRA2Dataset(object):
                variables=None):
         """Subset the data accordingly
 
-        Parameters
-        ----------
-        location : tuple
-            Location in the form of tuple (lat, lon) or (north, west, south, east)
+        Args:
+            location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
             coordinates in WGS84 system.
-        start_time : str
-            Timestamp in the form YYYY-MM-DDTHH
-        end_time : str
-            See above.
-        variables : list
-            List of variables to include, or None to include all
+            start_time (str): Timestamp in the form YYYY-MM-DDTHH
+            end_time (str): See above.
+            variables (list): List of variables to include, or None to include all
         """
 
         logger.debug("Subsetting dataset")
