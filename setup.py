@@ -21,7 +21,10 @@
 
 from setuptools import setup, find_packages
 
-from metreload import __version__ as version
+from metreload import __project__ as project,\
+                      __version__ as version,\
+                      __author__ as author,\
+                      __email__ as email
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -44,8 +47,8 @@ setup_requirements = ['pytest-runner', ]
 test_requirements = ['pytest', 'pytest-datadir']
 
 setup(
-    author="Spine Project",
-    author_email='spine_info@vtt.fi',
+    author=author,
+    author_email=email,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -64,7 +67,7 @@ setup(
     long_description=readme, #+ '\n\n' + history,
     include_package_data=True,
     keywords=['reanalysis', 'data', 'meteorology'],
-    name='MetReLoad',
+    name=project,
     packages=find_packages(include=['metreload']),
     setup_requires=setup_requirements,
     test_suite='tests',

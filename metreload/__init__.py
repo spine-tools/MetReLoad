@@ -2,6 +2,7 @@
 
 """Top-level package for MetReLoad."""
 
-__author__ = """Erkka Rinne"""
-__email__ = 'erkka.rinne@vtt.fi'
+__project__ = "MetReLoad"
+__author__ = "Spine Project"
+__email__ = "spine_info@vtt.fi"
 __version__ = '0.1.0'
