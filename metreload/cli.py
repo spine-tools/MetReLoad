@@ -28,6 +28,7 @@ import logzero
 from logzero import logger
 import click
 
+from metreload import __version__ as version
 from metreload.merra2 import get_merra2_data
 from metreload.gis import get_shapefile_bbox
 
@@ -54,7 +55,7 @@ def print_help(ctx):
 
 
 @click.group(invoke_without_command=True)
-@click.version_option()
+@click.version_option(version)
 @click.option('--debug', is_flag=True, default=False)
 @click.pass_context
 def cli(ctx, debug):
