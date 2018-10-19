@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Updated the installation and development instructions in README.md
+### Fixed
+- Built exe crashes with the --version option
 
 ## [0.2.0] - 2018-10-16
 ### Added
