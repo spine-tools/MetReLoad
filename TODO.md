@@ -2,6 +2,7 @@
 
 ## Fix
 - Case if area is over 180° longitude or around the poles or if user request whole world except area
+- MetReLoad hangs if collection set to M2C0NXASM
 
 ## Add
 - Better error messages for bad coordinates (`MERRA2Dataset.subset()`)
