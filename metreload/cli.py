@@ -91,8 +91,7 @@ def merra2(ctx, collection, username, password, output_dir,
     if collection is None:
         raise click.UsageError("Missing collection name")
 
-
-    #Parse dates
+    # Parse dates
     for date_text in [start_time, end_time]:
         try:
             datetime.strptime(date_text, '%Y-%m-%d')
@@ -104,7 +103,7 @@ def merra2(ctx, collection, username, password, output_dir,
         except TypeError:
             raise click.UsageError("Start or end time missing")
 
-    #Parse variables
+    # Parse variables
     if variables is not None:
         try:
             variables_list = [x.strip() for x in variables.split(',')]
@@ -115,7 +114,7 @@ def merra2(ctx, collection, username, password, output_dir,
     else:
         variables_list = None
 
-    #Parse location
+    # Parse location
     if os.path.isfile(location):
         try:
             coords = get_shapefile_bbox(location)

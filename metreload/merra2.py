@@ -51,7 +51,7 @@ class MERRA2Dataset(object):
 
     def __init__(self, ds):
         """
-        
+
         Args:
             ds (xarray.Dataset)
         """
@@ -86,9 +86,10 @@ class MERRA2Dataset(object):
 
         Args:
             collection (str): Earth Science Data Types Name of the collection (9 characters)
-            username (str) 
+            username (str)
             password (str)
-            base_url (str, optional): Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
+            base_url (str, optional): Base url for requests,
+                                      default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
         """
 
         # Initialize session and open dataset
@@ -169,7 +170,7 @@ class MERRA2Dataset(object):
 
         logger.debug("Subsetting dataset")
         subset_ds = self._subset_ds
-        
+
         # Select variables
         if variables is not None:
             variables_to_get = list()
