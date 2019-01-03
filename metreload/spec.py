@@ -3,7 +3,7 @@ Specifications for PyInstaller
 """
 
 from PyInstaller.building.build_main import Analysis, PYZ
-from PyInstaller.utils.hooks import copy_metadata
+from PyInstaller.utils.hooks import copy_metadata, collect_data_files
 
 from . import __version__ as version
 
@@ -19,9 +19,14 @@ a = Analysis(['metreload/cli.py'],
              pathex=[],
              binaries=[],
              datas=copy_metadata('pydap')\
+                   + collect_data_files('distributed')\
                    + [('docs/_build/html', 'documentation')],
              hiddenimports=['pandas._libs.tslibs.np_datetime',
-                            'pandas._libs.skiplist'],
+                            'pandas._libs.skiplist',
+                            'pydap.responses.das',
+                            'pydap.responses.html',
+                            'pydap.responses.ascii',
+                            'pydap.responses.version'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

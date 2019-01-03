@@ -102,11 +102,16 @@ class MERRA2Dataset(object):
             raise RuntimeError(err_str)
 
         logger.debug("Opening Pydap data store")
+        store = None
         try:
             store = PydapDataStore.open(url, session=session)
+        except ModuleNotFoundError:  # pylint: disable=W0706
+            raise  # Special case for detecting missing packages
         except Exception:
-            session.close()
             raise RuntimeError("Invalid url '{}'".format(url))
+        finally:
+            if not store:  # Clean up if store was not opened
+                session.close()
 
         logger.debug("Opening dataset")
         try:
