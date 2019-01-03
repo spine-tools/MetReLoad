@@ -2,9 +2,6 @@
 Specifications for PyInstaller
 """
 
-from subprocess import check_output
-from warnings import warn
-
 from PyInstaller.building.build_main import Analysis, PYZ
 from PyInstaller.utils.hooks import copy_metadata
 
@@ -15,7 +12,7 @@ BLOCK_CIPHER = None
 UPX = True
 BASENAME = 'metreload'
 
-name_with_version = '{}-{}'.format(BASENAME, version)
+name_with_version = '{}-{}'.format(BASENAME, version)  # pylint: disable=C0103
 
 # Do analysis
 a = Analysis(['metreload/cli.py'],
