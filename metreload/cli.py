@@ -91,22 +91,6 @@ def merra2(ctx, collection, username, password, output_dir,
     if collection is None:
         raise click.UsageError("Missing collection name")
 
-    # TODO: Check if this is needed
-    # frame = inspect.currentframe()
-    # args, _, _, values = inspect.getargvalues(frame)
-    # errmsg=""
-    # str_call="Executing command:\nmerra2 "
-    # for i in args:
-    #     if str(i)=="password":
-    #         str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
-    #     else:
-    #         str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
-    #     if values[i] is None or values[i] is "":
-    #         errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)  pylint: disable=C0301
-    #         click.echo(errmsg)
-    #         print_usage(ctx)
-    #         raise click.ClickException("Abort, search log for keyword ERROR")
-    # click.echo(str_call+"\n")
 
     #Parse dates
     for date_text in [start_time, end_time]:
