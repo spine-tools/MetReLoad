@@ -37,7 +37,17 @@ def get_merra2_data(collection, username, password,
                     savedir,
                     start_time, end_time,
                     variables, location):
-    """Convenience function for downloading MERRA-2 data"""
+    """Convenience function for downloading MERRA-2 data as netCDF files
+    
+    Args:
+        collection (str): Name of data collection
+        savedir (str): Directory to save files to
+        start_time (str): Timestamp in the form YYYY-MM-DDTHH
+        end_time (str): See above.
+        variables (list): List of variables to include, or None to include all
+        location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
+                          coordinates in WGS84 system.
+    """
     with MERRA2Dataset.open(collection, username, password) as dataset:
         dataset.subset(location,
                        start_time=start_time, end_time=end_time,
