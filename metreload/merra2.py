@@ -22,16 +22,32 @@ Module for retrieving MERRA-2 data
 """
 
 import os.path
-from logzero import logger
-from webob.exc import HTTPError
 
+
+from webob.exc import HTTPError
 import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
+from logzero import logger
+import settings
 
 DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
 TIME_CHUNKS = {'time': 24}
+
+def get_merra2_collection_dataframe(collection, username, password,
+                    savedir,
+                    start_time, end_time,
+                    variables, location):
+        with MERRA2Dataset.open(collection, username=username,
+                                password=password) as dataset:
+            dataset.subset(location,
+                           start_time, end_time,
+                           variables)
+
+            xr = dataset.to_xarray()
+
+        return xr.to_dataframe()
 
 def get_merra2_data(collection, username, password,
                     savedir,
@@ -65,6 +81,7 @@ class MERRA2Dataset(object):
         self._coords = [coord for coord in ds.coords
                         if len(ds.coords[coord]) > 1]
         self._variables = list(ds.data_vars)
+
 
     def __del__(self):
         self._subset_ds.close()

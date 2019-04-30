@@ -3,9 +3,8 @@
 
 """Tests for CLI"""
 
-from click.testing import CliRunner
-
 from metreload import cli
+from click.testing import CliRunner
 
 
 def test_command_line_interface():
