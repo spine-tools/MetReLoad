@@ -28,6 +28,7 @@ import logzero
 from logzero import logger
 import click
 
+from metreload import __version__ as version
 from metreload.merra2 import get_merra2_data
 from metreload.gis import get_shapefile_bbox
 
@@ -54,7 +55,7 @@ def print_help(ctx):
 
 
 @click.group(invoke_without_command=True)
-@click.version_option()
+@click.version_option(version)
 @click.option('--debug', is_flag=True, default=False)
 @click.pass_context
 def cli(ctx, debug):
@@ -90,24 +91,7 @@ def merra2(ctx, collection, username, password, output_dir,
     if collection is None:
         raise click.UsageError("Missing collection name")
 
-    # TODO: Check if this is needed
-    # frame = inspect.currentframe()
-    # args, _, _, values = inspect.getargvalues(frame)
-    # errmsg=""
-    # str_call="Executing command:\nmerra2 "
-    # for i in args:
-    #     if str(i)=="password":
-    #         str_call=str_call+"--"+"" +str(i)+"=\"<not_shown>\" "
-    #     else:
-    #         str_call=str_call+"--"+"" +str(i)+"=\""+ str(values[i]) +"\" "
-    #     if values[i] is None or values[i] is "":
-    #         errmsg="ERROR: Option "+str(i)+"=\""+str(values[i])+"\" is invalid\n"+"Option list: "+str(args)  pylint: disable=C0301
-    #         click.echo(errmsg)
-    #         print_usage(ctx)
-    #         raise click.ClickException("Abort, search log for keyword ERROR")
-    # click.echo(str_call+"\n")
-
-    #Parse dates
+    # Parse dates
     for date_text in [start_time, end_time]:
         try:
             datetime.strptime(date_text, '%Y-%m-%d')
@@ -119,7 +103,7 @@ def merra2(ctx, collection, username, password, output_dir,
         except TypeError:
             raise click.UsageError("Start or end time missing")
 
-    #Parse variables
+    # Parse variables
     if variables is not None:
         try:
             variables_list = [x.strip() for x in variables.split(',')]
@@ -130,7 +114,7 @@ def merra2(ctx, collection, username, password, output_dir,
     else:
         variables_list = None
 
-    #Parse location
+    # Parse location
     if os.path.isfile(location):
         try:
             coords = get_shapefile_bbox(location)

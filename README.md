@@ -11,9 +11,7 @@ Install required packages with
 
 Install MetReLoad with
 
-    pip install [-e] .
-
-Use the `-e` switch if you want an editable copy (for development).
+    pip install .
 
 ## Usage
 
@@ -35,7 +33,7 @@ Install development requirements into your current Python environment with
 
     pip install -r requirements.txt -r requirements_dev.txt
 
-Alternatively, if you are using `conda` you can also create a new development environment with
+Alternatively, if you are using conda you can also create a new development environment with
 
     conda env create --file conda/develop.yml --name <NAME>
 
@@ -49,7 +47,9 @@ Before committing, run tests with
 
 ### Building with PyInstaller
 
-PyInstaller version 3.4 is required. Excute 
+PyInstaller version 3.4 (or newer) is required. 
+Follow above instructions to install all development requirements (including PyInstaller).
+Excute 
 
     pyinstaller [-y] metreload.spec
 

@@ -3,6 +3,6 @@
 """Top-level package for MetReLoad."""
 
 __project__ = "MetReLoad"
-__author__ = "Spine Project"
+__author__ = "Spine Project Consortium"
 __email__ = "spine_info@vtt.fi"
-__version__ = '0.2.0'
+__version__ = '0.2.1'
