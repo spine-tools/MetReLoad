@@ -29,7 +29,6 @@ import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
 from logzero import logger
-import settings
 
 DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
