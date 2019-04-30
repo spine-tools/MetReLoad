@@ -1,8 +1,6 @@
 """Test MERRA-2 functionality"""
 
 import os.path
-import settings
-
 import pytest
 
 from xarray import open_dataset
