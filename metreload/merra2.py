@@ -67,7 +67,17 @@ def get_merra2_data(collection, username, password,
                     savedir,
                     start_time, end_time,
                     variables, location):
-    """Convenience function for downloading MERRA-2 data"""
+    """Convenience function for downloading MERRA-2 data as netCDF files
+    
+    Args:
+        collection (str): Name of data collection
+        savedir (str): Directory to save files to
+        start_time (str): Timestamp in the form YYYY-MM-DDTHH
+        end_time (str): See above.
+        variables (list): List of variables to include, or None to include all
+        location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
+                          coordinates in WGS84 system.
+    """
     with MERRA2Dataset.open(collection, username, password) as dataset:
         dataset.subset(location,
                        start_time=start_time, end_time=end_time,
@@ -81,7 +91,7 @@ class MERRA2Dataset(object):
 
     def __init__(self, ds):
         """
-        
+
         Args:
             ds (xarray.Dataset)
         """
@@ -117,9 +127,10 @@ class MERRA2Dataset(object):
 
         Args:
             collection (str): Earth Science Data Types Name of the collection (9 characters)
-            username (str) 
+            username (str)
             password (str)
-            base_url (str, optional): Base url for requests, default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
+            base_url (str, optional): Base url for requests,
+                                      default https://goldsmr4.gesdisc.eosdis.nasa.gov/dods
         """
 
         # Initialize session and open dataset
@@ -132,11 +143,16 @@ class MERRA2Dataset(object):
             raise RuntimeError(err_str)
 
         logger.debug("Opening Pydap data store")
+        store = None
         try:
             store = PydapDataStore.open(url, session=session)
+        except ModuleNotFoundError:  # pylint: disable=W0706
+            raise  # Special case for detecting missing packages
         except Exception:
-            session.close()
             raise RuntimeError("Invalid url '{}'".format(url))
+        finally:
+            if not store:  # Clean up if store was not opened
+                session.close()
 
         logger.debug("Opening dataset")
         try:
@@ -200,7 +216,7 @@ class MERRA2Dataset(object):
 
         logger.debug("Subsetting dataset")
         subset_ds = self._subset_ds
-        
+
         # Select variables
         if variables is not None:
             variables_to_get = list()
