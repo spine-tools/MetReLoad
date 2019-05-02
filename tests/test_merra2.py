@@ -29,20 +29,19 @@ def time_variant_dataset(shared_datadir):
 @pytest.mark.filterwarnings("ignore:password was not set")
 def test_merra2_session():
     with pytest.raises(RuntimeError):
-        with MERRA2Dataset.open('M2C0NXASM', username=settings.MERRA2_USERNAME, password=settings.MERRA2_PASSWORD) as dataset:
+        with MERRA2Dataset.open('M2C0NXASM', username=None, password=None) as dataset:
             pass
 
 
 @pytest.mark.filterwarnings("ignore:password was not set")
 def test_merra2_collection():
     with pytest.raises(RuntimeError):
-        with MERRA2Dataset.open('foobar', username=settings.MERRA2_USERNAME, password=settings.MERRA2_PASSWORD) as dataset:
+        with MERRA2Dataset.open('foobar', username=None, password=None) as dataset:
             pass
 
 @pytest.mark.filterwarnings("ignore:password was not set")
 def test_merra2_collection_data_frame():
-    with MERRA2Dataset.open('M2I1NXASM', username=settings.MERRA2_USERNAME,
-                            password=settings.MERRA2_PASSWORD) as dataset:
+    with MERRA2Dataset.open('M2I1NXASM', username=None, password=None) as dataset:
         dataset.subset((53.34, 6.2),
                        start_time="2018-01-01", end_time="2018-01-05",
                        variables=["T2M"])

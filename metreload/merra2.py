@@ -38,6 +38,21 @@ def get_merra2_collection_dataframe(collection, username, password,
                     savedir,
                     start_time, end_time,
                     variables, location):
+        """get a MERRA-2 data collection
+
+            Args:
+                collection (str): Earth Science Data Types Name of the collection (9 characters)
+                username (str)
+                password (str)
+                savedir (str): not used in this version
+                start_time (str): Timestamp in the form YYYY-MM-DD
+                end_time (str): Timestamp in the form YYYY-MM-DD
+                variables [(str)]: List of variables to include, or None to include all
+                location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
+                coordinates in WGS84 system.
+
+        """
+
         with MERRA2Dataset.open(collection, username=username,
                                 password=password) as dataset:
             dataset.subset(location,
