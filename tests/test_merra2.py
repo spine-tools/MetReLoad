@@ -4,6 +4,8 @@ import os.path
 import pytest
 
 from xarray import open_dataset
+import pandas as pd
+
 from metreload.merra2 import MERRA2Dataset
 
 
@@ -39,24 +41,14 @@ def test_merra2_collection():
         with MERRA2Dataset.open('foobar', username=None, password=None) as dataset:
             pass
 
-@pytest.mark.filterwarnings("ignore:password was not set")
-def test_merra2_collection_data_frame():
-    with MERRA2Dataset.open('M2I1NXASM', username=None, password=None) as dataset:
-        dataset.subset((53.34, 6.2),
-                       start_time="2018-01-01", end_time="2018-01-05",
-                       variables=["T2M"])
-        xr = dataset.to_xarray()
-        dt = xr.to_dataframe()
-
-
-
-
-
-
-
 
 def test_time_invariant_collection(time_invariant_dataset):
     time_invariant_dataset.subset(location=(0, 0))
     ds = time_invariant_dataset.to_xarray()
     with pytest.raises(TypeError):
         len(ds['time'])
+
+
+@pytest.mark.filterwarnings("ignore:password was not set")
+def test_merra2_collection_to_dataframe(time_variant_dataset):
+    assert isinstance(time_variant_dataset.to_dataframe(), pd.DataFrame)

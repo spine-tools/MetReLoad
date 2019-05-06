@@ -55,7 +55,7 @@ def get_merra2_collection_dataframe(collection, username, password,
         dataset.subset(location,
                        start_time, end_time,
                        variables)
-        return dataset.to_xarray().to_dataframe()
+        return dataset.to_dataframe()
 
 
 def get_merra2_data(collection, username, password,
@@ -195,6 +195,11 @@ class MERRA2Dataset(object):
         """
         logger.debug("Loading dask array to memory")
         return self._subset_ds.squeeze().load()
+
+    def to_dataframe(self):
+        """Convert to pandas DataFrame
+        """
+        return self.to_xarray().to_dataframe()
 
     def subset(self, location=None,
                start_time=None, end_time=None,
