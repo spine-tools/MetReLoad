@@ -23,7 +23,6 @@ Module for retrieving MERRA-2 data
 
 import os.path
 
-
 from webob.exc import HTTPError
 import xarray as xa
 from xarray.backends import PydapDataStore
@@ -34,41 +33,37 @@ DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
 TIME_CHUNKS = {'time': 24}
 
+
 def get_merra2_collection_dataframe(collection, username, password,
-                    savedir,
-                    start_time, end_time,
-                    variables, location):
-        """get a MERRA-2 data collection
+                                    start_time, end_time,
+                                    variables, location):
+    """Get a MERRA-2 data collection as a pandas DataFrame
 
-            Args:
-                collection (str): Earth Science Data Types Name of the collection (9 characters)
-                username (str)
-                password (str)
-                savedir (str): not used in this version
-                start_time (str): Timestamp in the form YYYY-MM-DD
-                end_time (str): Timestamp in the form YYYY-MM-DD
-                variables [(str)]: List of variables to include, or None to include all
-                location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
-                coordinates in WGS84 system.
+    Args:
+        collection (str): Earth Science Data Types Name of the collection (9 characters)
+        username (str)
+        password (str)
+        start_time (str): Timestamp in the form YYYY-MM-DD
+        end_time (str): Timestamp in the form YYYY-MM-DD
+        variables [(str)]: List of variables to include, or None to include all
+        location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
+        coordinates in WGS84 system.
+    """
 
-        """
+    with MERRA2Dataset.open(collection, username=username,
+                            password=password) as dataset:
+        dataset.subset(location,
+                       start_time, end_time,
+                       variables)
+        return dataset.to_xarray().to_dataframe()
 
-        with MERRA2Dataset.open(collection, username=username,
-                                password=password) as dataset:
-            dataset.subset(location,
-                           start_time, end_time,
-                           variables)
-
-            xr = dataset.to_xarray()
-
-        return xr.to_dataframe()
 
 def get_merra2_data(collection, username, password,
                     savedir,
                     start_time, end_time,
                     variables, location):
     """Convenience function for downloading MERRA-2 data as netCDF files
-    
+
     Args:
         collection (str): Name of data collection
         savedir (str): Directory to save files to

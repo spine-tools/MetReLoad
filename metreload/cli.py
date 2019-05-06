@@ -19,22 +19,18 @@
 
 """Console script for MetReLoad"""
 
-
-
 import os.path
 import logging
-
-
 from getpass import getuser
 from datetime import datetime
 
-
+import logzero
+from logzero import logger
+import click
 
 from metreload import __version__ as version
 from metreload.merra2 import get_merra2_data
 from metreload.gis import get_shapefile_bbox
-
-import click
 
 
 def print_usage(ctx, hint=True):
@@ -143,7 +139,7 @@ def merra2(ctx, collection, username, password, output_dir,
         get_merra2_data(collection, username, password, output_dir,
                         start_time, end_time, variables_list, coords)
     except RuntimeError as err:
-        #logger.error(str(err))
+        logger.error(str(err))
         raise click.ClickException(err)
     else:
         click.echo("Done!")
