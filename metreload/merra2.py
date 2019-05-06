@@ -22,23 +22,48 @@ Module for retrieving MERRA-2 data
 """
 
 import os.path
-from logzero import logger
-from webob.exc import HTTPError
 
+from webob.exc import HTTPError
 import xarray as xa
 from xarray.backends import PydapDataStore
 from pydap.cas.urs import setup_session
+from logzero import logger
 
 DODS_URL = 'https://goldsmr4.gesdisc.eosdis.nasa.gov/dods'
 
 TIME_CHUNKS = {'time': 24}
+
+
+def get_merra2_collection_dataframe(collection, username, password,
+                                    start_time, end_time,
+                                    variables, location):
+    """Get a MERRA-2 data collection as a pandas DataFrame
+
+    Args:
+        collection (str): Earth Science Data Types Name of the collection (9 characters)
+        username (str)
+        password (str)
+        start_time (str): Timestamp in the form YYYY-MM-DD
+        end_time (str): Timestamp in the form YYYY-MM-DD
+        variables [(str)]: List of variables to include, or None to include all
+        location (tuple): Location in the form of tuple (lat, lon) or (north, west, south, east)
+        coordinates in WGS84 system.
+    """
+
+    with MERRA2Dataset.open(collection, username=username,
+                            password=password) as dataset:
+        dataset.subset(location,
+                       start_time, end_time,
+                       variables)
+        return dataset.to_dataframe()
+
 
 def get_merra2_data(collection, username, password,
                     savedir,
                     start_time, end_time,
                     variables, location):
     """Convenience function for downloading MERRA-2 data as netCDF files
-    
+
     Args:
         collection (str): Name of data collection
         savedir (str): Directory to save files to
@@ -75,6 +100,7 @@ class MERRA2Dataset(object):
         self._coords = [coord for coord in ds.coords
                         if len(ds.coords[coord]) > 1]
         self._variables = list(ds.data_vars)
+
 
     def __del__(self):
         self._subset_ds.close()
@@ -169,6 +195,11 @@ class MERRA2Dataset(object):
         """
         logger.debug("Loading dask array to memory")
         return self._subset_ds.squeeze().load()
+
+    def to_dataframe(self):
+        """Convert to pandas DataFrame
+        """
+        return self.to_xarray().to_dataframe()
 
     def subset(self, location=None,
                start_time=None, end_time=None,

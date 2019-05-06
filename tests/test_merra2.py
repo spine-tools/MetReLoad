@@ -2,9 +2,10 @@
 # pylint: disable=missing-docstring,redefined-outer-name
 
 import os.path
-
 import pytest
 from xarray import open_dataset
+import pandas as pd
+
 from metreload.merra2 import MERRA2Dataset
 
 
@@ -44,3 +45,8 @@ def test_time_invariant_collection(time_invariant_dataset):
     ds = time_invariant_dataset.to_xarray()
     with pytest.raises(TypeError):
         len(ds['time'])
+
+
+@pytest.mark.filterwarnings("ignore:password was not set")
+def test_merra2_collection_to_dataframe(time_variant_dataset):
+    assert isinstance(time_variant_dataset.to_dataframe(), pd.DataFrame)

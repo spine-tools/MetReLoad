@@ -24,4 +24,5 @@ toolz==0.9.0
 urllib3==1.24.2
 WebOb==1.8.4
 xarray==0.11.0
+requests==2.21.0
 git+https://github.com/pydap/pydap@4ba09cad74de2e47ab898c45b1e2af1fe7e5bb4e
