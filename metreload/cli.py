@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (C) 2018  The Spine Project Authors
+# Copyright (C) 2018–2019  The Spine Project Authors
 #
 # This file is part of MetReload
 #

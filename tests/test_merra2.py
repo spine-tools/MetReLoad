@@ -1,10 +1,11 @@
 """Test MERRA-2 functionality"""
+# pylint: disable=missing-docstring,redefined-outer-name
 
 import os.path
-
 import pytest
-
 from xarray import open_dataset
+import pandas as pd
+
 from metreload.merra2 import MERRA2Dataset
 
 
@@ -17,7 +18,7 @@ def get_dataset(directory, collection_name):
 def time_invariant_dataset(shared_datadir):
     with get_dataset(shared_datadir, 'M2C0NXASM') as src,\
          MERRA2Dataset(src) as dataset:
-            yield dataset
+        yield dataset
 
 
 @pytest.fixture
@@ -30,15 +31,13 @@ def time_variant_dataset(shared_datadir):
 @pytest.mark.filterwarnings("ignore:password was not set")
 def test_merra2_session():
     with pytest.raises(RuntimeError):
-        with MERRA2Dataset.open('M2C0NXASM', username=None, password=None) as dataset:
-            pass
+        MERRA2Dataset.open('M2C0NXASM', username=None, password=None)
 
 
 @pytest.mark.filterwarnings("ignore:password was not set")
 def test_merra2_collection():
     with pytest.raises(RuntimeError):
-        with MERRA2Dataset.open('foobar', username=None, password=None) as dataset:
-            pass
+        MERRA2Dataset.open('foobar', username=None, password=None)
 
 
 def test_time_invariant_collection(time_invariant_dataset):
@@ -46,3 +45,8 @@ def test_time_invariant_collection(time_invariant_dataset):
     ds = time_invariant_dataset.to_xarray()
     with pytest.raises(TypeError):
         len(ds['time'])
+
+
+@pytest.mark.filterwarnings("ignore:password was not set")
+def test_merra2_collection_to_dataframe(time_variant_dataset):
+    assert isinstance(time_variant_dataset.to_dataframe(), pd.DataFrame)
