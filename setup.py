@@ -29,8 +29,8 @@ from metreload import __project__ as project,\
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-#with open('HISTORY.md') as history_file:
-#    history = history_file.read()
+with open('CHANGELOG.md') as history_file:
+    history = history_file.read()
 
 requirements = ['Click >=6.7',
                 'xarray >=0.10.8',
@@ -64,7 +64,7 @@ setup(
     },
     install_requires=requirements,
     license="LGPL-3.0-or-later",
-    long_description=readme, #+ '\n\n' + history,
+    long_description=readme + '\n\n' + history,
     include_package_data=True,
     keywords=['reanalysis', 'data', 'meteorology'],
     name=project,
