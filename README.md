@@ -1,4 +1,7 @@
 # MetReLoad
+
+[![Documentation Status](https://readthedocs.org/projects/metreload/badge/?version=latest)](https://metreload.readthedocs.io/en/latest/?badge=latest)
+
 Python application for downloading meteorological reanalysis data
 
 ## Installation
