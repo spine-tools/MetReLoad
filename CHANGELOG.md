@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Checked requirements.txt for inconsistencies
+
 ## [0.2.2]
 ### Added
 - New `MERRA2Dataset` method `to_dataframe()` to convert into a pandas `DataFrame`
