@@ -1,6 +1,7 @@
 # MetReLoad
 
 [![Documentation Status](https://readthedocs.org/projects/metreload/badge/?version=latest)](https://metreload.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/Spine-project/MetReLoad.svg?branch=master)](https://travis-ci.org/Spine-project/MetReLoad)
 
 Python application for downloading meteorological reanalysis data
 
