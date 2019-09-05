@@ -39,6 +39,7 @@ a = Analysis(['metreload/cli.py'],
              binaries=[],
              datas=copy_metadata('pydap')\
                    + collect_data_files('distributed')\
+                   + collect_data_files('dask')\
                    + [('docs/_build/html', 'documentation')],
              hiddenimports=['pandas._libs.tslibs.np_datetime',
                             'pandas._libs.skiplist',
