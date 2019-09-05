@@ -38,3 +38,15 @@ Options
 Refer to `MERRA-2 file
 specification <https://gmao.gsfc.nasa.gov/pubs/docs/Bosilovich785.pdf>`_
 for the names of data collections.
+
+
+Example
+~~~~~~~~
+
+For example, calling 
+
+.. code-block::
+
+  $ metreload merra2 -c M2T1NXFLX --start-time 2000-01-01 --end-time 2000-01-02 --variables ulml,vlml --location 61.5,23.766667
+  
+would download wind speed east and north components in Tampere, Finland, for 1–2 January 2000.
