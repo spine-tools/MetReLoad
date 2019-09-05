@@ -28,7 +28,7 @@ copyright = '2018, Spine Project'
 # author = ''
 
 # The short X.Y version
-# version = ''
+version = version.rpartition('.')[0]
 # The full version, including alpha/beta/rc tags
 release = version
 
