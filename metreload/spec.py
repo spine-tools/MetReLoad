@@ -58,7 +58,7 @@ pyz = PYZ(a.pure, a.zipped_data,
           cipher=BLOCK_CIPHER)
 
 options = dict(strip=False,
-               upx=True)
+               upx=UPX)
 
 exe_options = dict(name=BASENAME,
                    debug=False,
