@@ -40,7 +40,10 @@ requirements = ['Click >=6.7',
                 'netcdf4 >=1.3.1',
                 'dask >=0.19.1',
                 'pydap >=3.2.2',
-                'pyshp >=1.2.12']
+                'pyshp >=1.2.12',
+                'requests >= 2.21.0',
+                'toolz >=0.9.0'
+               ]
 
 setup_requirements = ['pytest-runner', ]
 
